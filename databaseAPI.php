@@ -110,45 +110,52 @@ try {
         echo json_encode($userRatings);
     }
 
-    elseif ($action == "addReputations" && $_SERVER['REQUEST_METHOD'] == "POST") {
-    $data = json_decode(file_get_contents("php://input"), true);
-    
-    echo json_encode(["received_data" => $data]);
-    // Log received data for debugging
-    error_log(print_r($data, true));
+    elseif ($action == "addReputations" && $_SERVER['REQUEST_METHOD'] == "POST") 
+    {
+        $data = json_decode(file_get_contents("php://input"), true);
+        
+        echo json_encode(["received_data" => $data]);
+        // Log received data for debugging
+        error_log(print_r($data, true));
 
-    // Check if $data is an array and has entries
-    if (!is_array($data) || empty($data)) {
-        echo json_encode(["error" => "Invalid or empty input data"]);
-        exit;
-    }
-    
-    foreach ($data as $entry) {
-        // Ensure all required fields are present
-        if (!isset($entry['userID']) || !isset($entry['totalReviews']) || !isset($entry['averageRating'])) {
-            echo json_encode(["error" => "Missing required fields in the request"]);
+        // Check if $data is an array and has entries
+        if (!is_array($data) || empty($data)) {
+            echo json_encode(["error" => "Invalid or empty input data"]);
             exit;
         }
+        
+        foreach ($data as $entry) {
+            // Ensure all required fields are present
+            if (!isset($entry['UserID']) || !isset($entry['TotalReviews']) || !isset($entry['AverageRating'])) {
+                echo json_encode(["error" => "Missing required fields in the request"]);
+                exit;
+            }
 
-        // Validate Inputs using filter_var directly on $entry
-        $entry['userID'] = filter_var($entry['userID'], FILTER_VALIDATE_INT);
-        $entry['averageRating'] = filter_var($entry['averageRating'], FILTER_VALIDATE_FLOAT);
-        $entry['totalReviews'] = filter_var($entry['totalReviews'], FILTER_VALIDATE_INT);
+            // Validate Inputs using filter_var directly on $entry
+            $entry['UserID'] = filter_var($entry['UserID'], FILTER_VALIDATE_INT);
+            $entry['AverageRating'] = filter_var($entry['AverageRating'], FILTER_VALIDATE_FLOAT);
+            $entry['TotalReviews'] = filter_var($entry['TotalReviews'], FILTER_VALIDATE_INT);
 
-        // Check for invalid input values
-        if ($entry['userID'] === false || $entry['averageRating'] === false || $entry['totalReviews'] === false) {
-            echo json_encode(["error" => "Invalid input data"]);
-            exit;
-        }
+            // Check for invalid input values
+            if ($entry['UserID'] === false || $entry['AverageRating'] === false || $entry['TotalReviews'] === false) {
+                echo json_encode(["error" => "Invalid input data"]);
+                exit;
+            }
 
-        // Insert reputation into the userReputation table
-        $stmt = $connection->prepare("INSERT INTO userReputation (userID, consRating, numOfReviews, updated) VALUES (?, ?, ?, NOW())");
-        $stmt->execute([$entry['userID'], $entry['averageRating'], $entry['totalReviews']]);
+            // Insert reputation into the userReputation table
+            $stmt = $connection->prepare("INSERT INTO userReputation (userID, averageRating, totalReviews, updated) VALUES (?, ?, ?, NOW())");
+            $stmt->execute([$entry['UserID'], $entry['AverageRating'], $entry['TotalReviews']]);
     }
 
     echo json_encode(["success" => true, "message" => "User reputations added!"]);
-}
+    }
+    elseif ($action == "getUserReputation" && $_SERVER['REQUEST_METHOD'] == "GET") {
+        $stmt = $connection->prepare("SELECT * FROM userReputation where UserID = ? ORDER BY ReputationID DESC LIMIT 1");
+        $stmt->execute([$userID]);
+        $reputation = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        echo json_encode($reputation);
+    }
 
 } catch (Exception $e) {
     echo json_encode(["error" => $e->getMessage()]);
