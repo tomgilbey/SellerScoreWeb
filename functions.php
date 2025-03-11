@@ -33,6 +33,8 @@ function makePageStart($title)
     <head>
         <meta charset="UTF-8">
         <title>$title</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
         <!-- Bootstrap 4.5 CSS -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
@@ -64,68 +66,72 @@ function makeNavBar() {
   // Start of the HTML structure
   $output = <<<HTML
   <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
-    <a class="navbar-brand" href="#">SellerScore</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    
-    <div class="collapse navbar-collapse" id="navbarCollapse">
-      
-      <!-- Left Side: Navigation Links -->
-      <ul class="navbar-nav mr-auto">
+      <a class="navbar-brand" href="#">SellerScore</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" 
+              aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+          
+          <!-- Left Side: Navigation Links -->
+          <ul class="navbar-nav mr-auto">
 HTML;
 
-  
-  $output .= '<li class="nav-item' . ($currentPage == 'index.php' ? ' active' : '') . '">
-                <a class="nav-link" href="index.php">Home</a>
-              </li>';
-  $output .= '<li class="nav-item' . ($currentPage == 'reputation.php' ? ' active' : '') . '">
-                <a class="nav-link" href="reputation.php">My Reputation</a>
-              </li>';
-  $output .= '<li class="nav-item' . ($currentPage == 'manage.php' ? ' active' : '') . '">
-                <a class="nav-link" href="manage.php">Manage Account</a>
-              </li>';
+  // Add navigation links with proper formatting
+  $output .= "\n    <li class='nav-item" . ($currentPage == 'index.php' ? ' active' : '') . "'>
+                  <a class='nav-link' href='index.php'>Home</a>
+                </li>\n";
+  $output .= "    <li class='nav-item" . ($currentPage == 'reputation.php' ? ' active' : '') . "'>
+                  <a class='nav-link' href='reputation.php'>My Reputation</a>
+                </li>\n";
+  $output .= "    <li class='nav-item" . ($currentPage == 'manage.php' ? ' active' : '') . "'>
+                  <a class='nav-link' href='manage.php'>Manage Account</a>
+                </li>\n";
 
   // Continue navbar HTML
   $output .= <<<HTML
-      </ul>
+          </ul>
 
-      <!-- Right Side: Search Bar + Login/Register -->
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item">
-          <form class="form-inline d-flex">
-            <input class="form-control mr-sm-2" type="text" placeholder="Account Search" aria-label="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-          </form>
-        </li>
+          <!-- Right Side: Search Bar + Login/Register -->
+          <ul class="navbar-nav ml-auto">
+              <li class="nav-item position-relative">
+                <form class="form-inline d-flex" action="searchResults.php" method="GET">
+                    <input class="form-control mr-sm-2" type="text" name="account" id="searchInput" 
+                          placeholder="Account Search" aria-label="Search" autocomplete="off">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                </form>
+                <div id="searchResults" class="list-group position-absolute w-100" style="z-index: 1000;"></div> <!-- Search results -->
+              </li>
 HTML;
 
   // Add dynamic login/logout links
   if (check_login()) {
-      $output .= '<li class="nav-item' . ($currentPage == 'profile.php' ? ' active' : '') . '">
-                    <a class="nav-link" href="profile.php">Profile</a>
-                  </li>';
-      $output .= '<li class="nav-item">
-                    <a class="nav-link" href="logout.php">Logout</a>
-                  </li>';
+      $output .= "\n    <li class='nav-item" . ($currentPage == 'profile.php' ? ' active' : '') . "'>
+                      <a class='nav-link' href='profile.php'>Profile</a>
+                    </li>\n";
+      $output .= "    <li class='nav-item'>
+                      <a class='nav-link' href='logout.php'>Logout</a>
+                    </li>\n";
   } else {
-      $output .= '<li class="nav-item' . ($currentPage == 'login.php' ? ' active' : '') . '">
-                    <a class="nav-link" href="login.php">Login</a>
-                  </li>';
-      $output .= '<li class="nav-item' . ($currentPage == 'register.php' ? ' active' : '') . '">
-                    <a class="nav-link" href="register.php">Register</a>
-                  </li>';
+      $output .= "\n    <li class='nav-item" . ($currentPage == 'login.php' ? ' active' : '') . "'>
+                      <a class='nav-link' href='login.php'>Login</a>
+                    </li>\n";
+      $output .= "    <li class='nav-item" . ($currentPage == 'register.php' ? ' active' : '') . "'>
+                      <a class='nav-link' href='register.php'>Register</a>
+                    </li>\n";
   }
 
   // Closing HTML
   $output .= <<<HTML
-      </ul>
-    </div>
+          </ul>
+      </div>
   </nav>
 HTML;
 
   return $output;
 }
+
 
 function makeFooter($footerText) {
     return <<<HTML
@@ -133,6 +139,37 @@ function makeFooter($footerText) {
       <div class="container">
         <span class="text-muted">$footerText</span>
       </div>
+      <script> // JavaScript for search bar
+      document.addEventListener("DOMContentLoaded", function() {
+        const searchInput = document.getElementById("searchInput"); // Get search input field
+        const searchResults = document.getElementById("searchResults"); // Get search results div
+
+        searchInput.addEventListener("keyup", function() { // Listen for keyup events
+        let query = searchInput.value.trim(); // Trim whitespace from input
+
+        if (query.length < 3) { 
+            searchResults.innerHTML = ""; // Clear results if less than 3 chars
+            return;
+        }
+
+        // Send AJAX request to searchUsers.php
+        fetch("searchUsers.php?q=" + encodeURIComponent(query))
+            .then(response => response.text()) // Parse response as text
+            .then(data => {
+                searchResults.innerHTML = data; // Insert results
+            })
+            .catch(error => console.error("Error:", error));
+     });
+
+    // Hide results when clicking outside
+      document.addEventListener("click", function(event) {
+      if (!searchResults.contains(event.target) && event.target !== searchInput) {
+          searchResults.innerHTML = "";
+      }
+    });
+});
+</script>
+
     </footer>
 
 HTML;
@@ -221,6 +258,76 @@ function validate_login() {
   } catch (Exception $e) {
       echo "There was a problem: " . $e->getMessage();
   }
+  return array($input, $errors);
+}
+
+function validate_registration()
+{
+  $errors = [];
+  $input = [
+    'first_name' => trim($_POST['first_name']),
+    'surname' => trim($_POST['surname']),
+    'username' => trim($_POST['username']),
+    'email' => trim($_POST['email']),
+    'dob' => trim($_POST['dob']),
+    'password' => trim($_POST['password'])
+  ];
+
+  if (empty($input['first_name'])) {
+    $errors[] = "First Name is required.";
+  }
+  if (empty($input['surname'])) {
+    $errors[] = "Surname is required.";
+  }
+  if (empty($input['username'])) {
+    $errors[] = "Username is required.";
+  }
+  elseif (strlen($input['username']) < 5) {
+    $errors[] = "Username must be at least 5 characters.";
+  }
+  if (empty($input['email'])) {
+    $errors[] = "Email is required.";
+  }
+  if (empty($input['dob'])) {
+    $errors[] = "Date of Birth is required.";
+  }
+  if (empty($input['password']) || strlen($input['password']) < 6) {
+    $errors[] = "Password must be at least 6 characters.";
+}
+
+  if (empty($errors)) {
+    try {
+      $dbConn = getConnection();
+
+      $stmt = $dbConn->prepare("SELECT COUNT(*) FROM Users WHERE Username = :username");
+      $stmt->execute([':username' => $input['username']]);
+      if ($stmt->fetchColumn() > 0) {
+        $errors[] = "Username already exists. Please choose another.";
+      }
+      
+      $stmt = $dbConn->prepare("SELECT COUNT(*) FROM Users WHERE email = :email");
+      $stmt->execute([':email' => $input['email']]);
+      if ($stmt->fetchColumn() > 0) {
+        $errors[] = "Email is already registered. Please use another email.";
+      }
+
+      if(empty($errors)) {
+        $sqlQuery = "INSERT INTO Users (FirstName, Surname, Username, email, DateOfBirth, HashedPassword, joinDate) VALUES (:first_name, :surname, :username, :email, :dob, :HashedPassword, now())";
+        $stmt = $dbConn->prepare($sqlQuery);
+        $stmt->execute(array(
+          ':first_name' => $input['first_name'],
+          ':surname' => $input['surname'],
+          ':username' => $input['username'],
+          ':email' => $input['email'],
+          ':dob' => $input['dob'],
+          ':HashedPassword' => password_hash($input['password'], PASSWORD_DEFAULT)
+        ));
+      }
+    } catch (Exception $e) {
+      $errors[] = "There was a problem: " . $e->getMessage();
+    }
+  }
+
   return array($input, $errors);
 }
 
