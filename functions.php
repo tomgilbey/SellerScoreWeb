@@ -137,7 +137,7 @@ function makeFooter($footerText) {
     return <<<HTML
     <footer class="footer">
       <div class="container">
-        <span class="text-muted">$footerText</span>
+        <span>$footerText</span>
       </div>
       <script> // JavaScript for search bar
       document.addEventListener("DOMContentLoaded", function() {

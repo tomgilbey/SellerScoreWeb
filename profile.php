@@ -156,33 +156,63 @@ if (isset($_GET['user']) && !empty(trim($_GET['user'])))
                     echo "<p>No marketplace links available for $username</p>\n";
                 }
 
-                $SQL = "SELECT f.*, m.marketplaceName 
-                FROM Feedback f 
-                LEFT JOIN Marketplace m ON f.marketplaceID = m.marketplaceID 
-                WHERE f.userID = :userID";
+                echo "<h2 class='mt-4'>User Reviews</h2>\n";
+                echo "<form id='reviewFilters' class='mb-3'>\n";
+                echo "<label for='sortReviews' class='form-label'><strong>Sort by:</strong></label>\n";
+                echo "<select id='sortReviews' class='form-select mb-2' name='sort'>\n";
+                echo "<option value='recent'>Most Recent</option>\n";
+                echo "<option value='oldest'>Oldest</option>\n";
+                echo "<option value='highest'>Highest Rating</option>\n";
+                echo "<option value='lowest'>Lowest Rating</option>\n";
+                echo "</select>\n";
 
-                $stmt = $dbConn->prepare($SQL);
-                $stmt->execute([':userID' => $userID]);
-                $feedback = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                echo "<label for='marketplaceFilter' class='form-label'><strong>Filter by Marketplace:</strong></label>\n";
+                echo "<select id='marketplaceFilter' class='form-select mb-2' name='marketplace'>\n";
+                echo "<option value='all'>All Marketplaces</option>\n";
+                echo "<option value='ebay'>eBay</option>\n";
+                echo "<option value='amazon'>Amazon</option>\n";
+                echo "<option value='vinted'>Vinted</option>\n";
+                echo "<option value='etsy'>Etsy</option>\n";
+                echo "</select>\n";
 
-                if(!empty($feedback))
-                {
-                    echo "<h2 class='mt-4'>User Reviews</h2>";
-                    echo "<div class='overflow-auto' style='max-height: 400px; padding-right: 10px; margin-bottom:50px'>\n";
 
-                    foreach($feedback as $review)
-                    {
-                        echo "<div class='card mb-3 shadow-sm'>\n";
-                        echo "<div class='card-body'>\n";
-                        echo "<h5 class='card-title'>" . str_repeat("⭐", $review['starRating']) . "</h5>\n";
-                        echo "<h6 class='card-subtitle mb-2 text-muted'>From {$review['marketplaceName']}</h6>\n";      
-                        echo "<p class='card-text'>{$review['textFeedback']}</p>\n";
-                        echo "<p class='text-muted'><small>By <strong>{$review['writtenBy']}</strong> on " . date("d M Y", strtotime($review['dateWritten'])) . "</small></p>\n";
-                        echo "</div>\n";
-                        echo "</div>\n";
-                    }
-                    echo "</div>\n";
-                }
+                echo "<button type='submit' class='btn btn-primary'>Apply Filters</button>\n";
+                echo "</form>\n";
+
+                echo "<div id='reviewsContainer' class='overflow-auto' style='max-height: 400px; padding-right: 10px; margin-bottom:50px'>\n"; // Overflow auto to allow scrolling
+                // Reviews will be loaded here dynamically
+                echo "</div>\n";
+
+                echo "<script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const reviewForm = document.getElementById('reviewFilters');
+                            const reviewsContainer = document.getElementById('reviewsContainer');
+
+                            function fetchReviews() {
+                                const formData = new FormData(reviewForm);
+                                formData.append('userID', " . json_encode($userID) . ");
+
+                                fetch('fetch_reviews.php', {
+                                    method: 'POST',
+                                    body: formData
+                                })
+                                .then(response => response.text())
+                                .then(data => {
+                                    reviewsContainer.innerHTML = data;
+                                })
+                                .catch(error => console.error('Error fetching reviews:', error));
+                            }
+
+                            reviewForm.addEventListener('submit', function (e) {
+                                e.preventDefault(); // Prevent page reload
+                                fetchReviews();
+                            });
+
+                            fetchReviews(); // Load reviews initially
+                        });
+                        </script>\n";
+
+                
             }  
             else
             {
