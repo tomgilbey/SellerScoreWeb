@@ -82,8 +82,8 @@ HTML;
   $output .= "\n    <li class='nav-item" . ($currentPage == 'index.php' ? ' active' : '') . "'>
                   <a class='nav-link' href='index.php'>Home</a>
                 </li>\n";
-  $output .= "    <li class='nav-item" . ($currentPage == 'reputation.php' ? ' active' : '') . "'>
-                  <a class='nav-link' href='reputation.php'>My Reputation</a>
+  $output .= "\n<li class='nav-item" . ($currentPage == 'myBreakdown.php' ? ' active' : '') . "'>
+                  <a class='nav-link' href='myBreakdown.php'>My Breakdown</a>\n
                 </li>\n";
   $output .= "    <li class='nav-item" . ($currentPage == 'manage.php' ? ' active' : '') . "'>
                   <a class='nav-link' href='manage.php'>Manage Account</a>
@@ -108,7 +108,7 @@ HTML;
   // Add dynamic login/logout links
   if (check_login()) {
       $output .= "\n    <li class='nav-item" . ($currentPage == 'profile.php' ? ' active' : '') . "'>
-                      <a class='nav-link' href='profile.php'>Profile</a>
+                      <a class='nav-link' href='profile.php?user=" . urlencode($_SESSION['username']) . "'>My Profile</a>
                     </li>\n";
       $output .= "    <li class='nav-item'>
                       <a class='nav-link' href='logout.php'>Logout</a>

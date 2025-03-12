@@ -5,7 +5,6 @@ echo makeNavBar();
 
 echo "<div class='container'>\n";
 
-
 if (isset($_GET['user']) && !empty(trim($_GET['user'])))
 {
     $username = trim($_GET['user']);
@@ -25,7 +24,17 @@ if (isset($_GET['user']) && !empty(trim($_GET['user'])))
         else
         {
             echo "<div class='container mt-4'>\n";
-            echo "<h2 class='mb-4'>$username's Reputation</h2>\n";
+            if (isset($_SESSION['userID']) && $_SESSION['userID'] === $user['userID'])
+            {
+                echo "<div class='alert alert-info' role='alert'>\n";
+                echo "<h2 class='mb-4'>Your Profile</h2>\n";
+                echo "</div>\n";
+            }
+            else
+            {
+                echo "<h2 class='mb-4'>$username's Reputation</h2>\n";
+            }
+            
             echo "<p><strong>Member Since: </strong>" . date("F Y", strtotime($user['joinDate'])) . "</p>\n";
 
             $userID = $user['userID'];
@@ -105,7 +114,7 @@ if (isset($_GET['user']) && !empty(trim($_GET['user'])))
                     echo "<h5 class='card-title'>Most Recent Reputation</h5>\n";
                     echo "<p><strong>Average Rating: </strong>" . $latestRep['averageRating'] . "⭐</p>\n";
                     echo "<p><strong>Total Reviews: </strong>" . $latestRep['totalReviews'] . "</p>\n";
-                    echo "<p><small><strong>Last Updated: </strong>" . date("d F Y", strtotime($latestRep['updated'])) . "</small></p>\n";
+                    echo "<p><small><strong>Updated: </strong>" . date("d F Y", strtotime($latestRep['updated'])) . "</small></p>\n";
                     echo "</div>\n";
                     echo "</div>\n";
                     echo "</div>\n";  
@@ -117,7 +126,7 @@ if (isset($_GET['user']) && !empty(trim($_GET['user'])))
                     echo "<h5 class='card-title'>10th Last Reputation</h5>\n";
                     echo "<p><strong>Average Rating: </strong>" . $tenthRep['averageRating'] . "⭐</p>\n";
                     echo "<p><strong>Total Reviews: </strong>" . $tenthRep['totalReviews'] . "</p>\n";
-                    echo "<p><small><strong>Last Updated: </strong>" . date("d F Y", strtotime($tenthRep['updated'])) . "</small></p>\n";
+                    echo "<p><small><strong>Updated: </strong>" . date("d F Y", strtotime($tenthRep['updated'])) . "</small></p>\n";
                     echo "</div>\n";
                     echo "</div>\n";
                     echo "</div>\n";  
@@ -210,6 +219,55 @@ if (isset($_GET['user']) && !empty(trim($_GET['user'])))
 
                             fetchReviews(); // Load reviews initially
                         });
+
+                        function showReplyBox(feedbackID) {
+                            document.getElementById('reply-box-' + feedbackID).style.display = 'block';
+                        }
+
+                        function submitReply(feedbackID)
+                        {
+                            const replyText = document.getElementById('reply-text-' + feedbackID).value;
+
+                            if (replyText.trim() === '')
+                            {
+                                alert('Please enter a reply before submitting!');
+                                return;
+                            }
+                            
+                            const xhr = new XMLHttpRequest();
+                            xhr.open('POST', 'submit_reply.php', true);
+                            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+                            xhr.onload = function()
+                            {
+                                if (xhr.status === 200)
+                                {
+                                    try 
+                                    {
+                                        const response = JSON.parse(xhr.responseText);
+                                        if (response.success)
+                                        {
+                                            alert('Reply submitted successfully!');
+                                            document.getElementById('reply-box-' + feedbackID).innerHTML = '<p>Reply: ' + replyText + '</p>';
+                                        }
+                                        else
+                                        {
+                                            alert('Error response: ' + response.message);
+                                        }
+                                    }
+                                    catch(e)
+                                    {
+                                        alert('Error parsing JSON: ' + e.message);
+                                    }
+                                }
+                                else
+                                {
+                                    alert('Error submitting reply: ' + xhr.status);
+                                }
+                                    
+                            };
+                            xhr.send('feedbackID=' + feedbackID + '&reply=' + encodeURIComponent(replyText));
+                        }
                         </script>\n";
 
                 
