@@ -1,6 +1,6 @@
 <?php
 require_once("functions.php");
-echo makePageStart("Home Page");
+echo makePageStart("Search Results");
 echo makeNavBar();
 
 echo "<div class='container'>";

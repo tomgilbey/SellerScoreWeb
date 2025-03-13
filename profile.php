@@ -1,10 +1,9 @@
 <?php
 require_once("functions.php");
-echo makePageStart("Home Page");
+echo makePageStart("Profile");
 echo makeNavBar();
 
-echo "<div class='container'>\n";
-
+echo "<div class='container-fluid text-center mb-5'>\n";
 if (isset($_GET['user']) && !empty(trim($_GET['user'])))
 {
     $username = trim($_GET['user']);
@@ -23,7 +22,7 @@ if (isset($_GET['user']) && !empty(trim($_GET['user'])))
         }
         else
         {
-            echo "<div class='container mt-4'>\n";
+            
             if (isset($_SESSION['userID']) && $_SESSION['userID'] === $user['userID'])
             {
                 echo "<div class='alert alert-info' role='alert'>\n";
@@ -34,7 +33,10 @@ if (isset($_GET['user']) && !empty(trim($_GET['user'])))
             {
                 echo "<h2 class='mb-4'>$username's Reputation</h2>\n";
             }
-            
+
+            echo "<div class='row justify-content-center'>\n";
+
+            echo "<div class='col-md-5'>\n";
             echo "<p><strong>Member Since: </strong>" . date("F Y", strtotime($user['joinDate'])) . "</p>\n";
 
             $userID = $user['userID'];
@@ -164,7 +166,10 @@ if (isset($_GET['user']) && !empty(trim($_GET['user'])))
                 {
                     echo "<p>No marketplace links available for $username</p>\n";
                 }
+                echo "</div>\n";
 
+
+                echo "<div class='col-md-5'>\n";
                 echo "<h2 class='mt-4'>User Reviews</h2>\n";
                 echo "<form id='reviewFilters' class='mb-3'>\n";
                 echo "<label for='sortReviews' class='form-label'><strong>Sort by:</strong></label>\n";
@@ -269,6 +274,7 @@ if (isset($_GET['user']) && !empty(trim($_GET['user'])))
                             xhr.send('feedbackID=' + feedbackID + '&reply=' + encodeURIComponent(replyText));
                         }
                         </script>\n";
+                        
 
                 
             }  
@@ -276,6 +282,7 @@ if (isset($_GET['user']) && !empty(trim($_GET['user'])))
             {
                 echo "<p>No reputation data available for $username</p>\n";
             }
+            echo "</div>\n";
             echo "</div>\n";
         }
         

@@ -1,4 +1,7 @@
 <?php
+/**
+ * @author Tom Gilbey
+ */
 require_once("functions.php");
 echo makePageStart("Home Page");
 echo makeNavBar();

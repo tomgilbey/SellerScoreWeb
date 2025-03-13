@@ -82,12 +82,22 @@ HTML;
   $output .= "\n    <li class='nav-item" . ($currentPage == 'index.php' ? ' active' : '') . "'>
                   <a class='nav-link' href='index.php'>Home</a>
                 </li>\n";
-  $output .= "\n<li class='nav-item" . ($currentPage == 'myBreakdown.php' ? ' active' : '') . "'>
-                  <a class='nav-link' href='myBreakdown.php'>My Breakdown</a>\n
+  $output .= "\n<li class='nav-item" . ($currentPage == 'myReputation.php' ? ' active' : '') . "'>
+                  <a class='nav-link' href='myReputation.php'>My Reputation</a>\n
                 </li>\n";
-  $output .= "    <li class='nav-item" . ($currentPage == 'manage.php' ? ' active' : '') . "'>
-                  <a class='nav-link' href='manage.php'>Manage Account</a>
-                </li>\n";
+  if (check_login())
+  {
+    $output .= "\n    <li class='nav-item" . ($currentPage == 'profile.php' ? ' active' : '') . "'>
+                      <a class='nav-link' href='profile.php?user=" . urlencode($_SESSION['username']) . "'>My Profile</a>
+                    </li>\n";
+  }
+  else
+  {
+    $output .= "\n    <li class='nav-item'>
+                      <a class='nav-link' href='login.php'>My Profile</a>
+                    </li>\n";
+  }
+  
 
   // Continue navbar HTML
   $output .= <<<HTML
@@ -107,9 +117,9 @@ HTML;
 
   // Add dynamic login/logout links
   if (check_login()) {
-      $output .= "\n    <li class='nav-item" . ($currentPage == 'profile.php' ? ' active' : '') . "'>
-                      <a class='nav-link' href='profile.php?user=" . urlencode($_SESSION['username']) . "'>My Profile</a>
-                    </li>\n";
+      $output .= "\n    <li class='nav-item" . ($currentPage == 'manage.php' ? ' active' : '') . "'>
+                        <a class='nav-link' href='manageAccount.php'>Manage Account</a>
+                      </li>\n";
       $output .= "    <li class='nav-item'>
                       <a class='nav-link' href='logout.php'>Logout</a>
                     </li>\n";
@@ -117,7 +127,7 @@ HTML;
       $output .= "\n    <li class='nav-item" . ($currentPage == 'login.php' ? ' active' : '') . "'>
                       <a class='nav-link' href='login.php'>Login</a>
                     </li>\n";
-      $output .= "    <li class='nav-item" . ($currentPage == 'register.php' ? ' active' : '') . "'>
+      $output .= "\n    <li class='nav-item" . ($currentPage == 'register.php' ? ' active' : '') . "'>
                       <a class='nav-link' href='register.php'>Register</a>
                     </li>\n";
   }

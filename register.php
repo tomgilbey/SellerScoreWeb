@@ -1,6 +1,6 @@
 <?php
 require_once("functions.php");
-echo makePageStart("Home Page");
+echo makePageStart("Register an Account");
 echo makeNavBar();
 echo"<div class='container'>\n";
 echo"<div class='box'>\n";
