@@ -16,7 +16,9 @@ if (isset($_GET['account']) && !empty(trim($_GET['account'])))
                     u.userID,
                     u.username,
                     ur.totalReviews,
-                    ur.averageRating
+                    ur.averageRating,
+                    um.marketplaceUsername,
+                    m.marketplaceName
                 FROM Users u
                 LEFT JOIN ( 
                     SELECT userID, totalReviews, averageRating
@@ -27,7 +29,10 @@ if (isset($_GET['account']) && !empty(trim($_GET['account'])))
                         GROUP BY userID
                     )
                 ) ur ON u.userID = ur.userID
-                WHERE u.username LIKE :searchTerm";
+                LEFT JOIN userMarketplace um ON u.userID = um.userID
+                LEFT JOIN Marketplace m ON um.marketplaceID = m.marketplaceID
+                WHERE u.username LIKE :searchTerm
+                OR um.marketplaceUsername LIKE :searchTerm";
         
         $stmt = $dbConn->prepare($SQL);
         $stmt->execute([':searchTerm' => "%$searchTerm%"]);
@@ -35,17 +40,42 @@ if (isset($_GET['account']) && !empty(trim($_GET['account'])))
 
         if($results)
         {
-            echo "<ul class='list-group'>";
+            $users = [];
             foreach ($results as $user) {
-                $reviewCount = $user['totalReviews'] ?? 0;
-                $averageRating = $user['averageRating'] ?? "N/A";
+                $userID = $user['userID'];
+                if (!isset($users[$userID])) {
+                    $users[$userID] = [
+                        'username' => $user['username'],
+                        'totalReviews' => $user['totalReviews'] ?? 0,
+                        'averageRating' => $user['averageRating'] ?? "N/A",
+                        'marketplaces' => []
+                    ];
+                }
+                if ($user['marketplaceUsername'] && $user['marketplaceName']) {
+                    $users[$userID]['marketplaces'][] = [
+                        'marketplaceUsername' => $user['marketplaceUsername'],
+                        'marketplaceName' => $user['marketplaceName']
+                    ];
+                }
+            }
+
+            echo "<ul class='list-group'>";
+            foreach ($users as $user) {
                 echo "<li class='list-group-item'>
                         <a href='profile.php?user={$user['username']}' class='d-block text-decoration-none'>
-                        <strong>{$user['username']}</strong>
+                        <strong class='text-dark'>{$user['username']}</strong>
                         <br>
-                        <span class='text-muted'>Reviews: $reviewCount | Average Rating: $averageRating</span>
-                        </a>
-                        </li>";
+                        <span class='text-dark'>Reviews: {$user['totalReviews']} | Average Rating: {$user['averageRating']}</span>";
+
+                if (!empty($user['marketplaces'])) {
+                    echo "<br><span class='text-dark'>Marketplaces:</span>";
+                    foreach ($user['marketplaces'] as $marketplace) {
+                        echo "<br><span class='text-dark'>Username: {$marketplace['marketplaceUsername']} | Marketplace: {$marketplace['marketplaceName']}</span>";
+                    }
+                }
+
+                echo "</a>
+                      </li>";
             }
             echo "</ul>";
         }
@@ -65,7 +95,6 @@ else
 }
 
 echo "</div>";
-
 
 echo makeFooter("This is the footer");
 echo makePageEnd();

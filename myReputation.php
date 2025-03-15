@@ -17,7 +17,7 @@ try
     $stmt->execute([':userID' => $userID]);
     $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $marketplaceSQL = "SELECT * FROM Marketplace";
+    $marketplaceSQL = "SELECT * FROM Marketplace ORDER BY marketplaceID";
     $stmt = $dbConn->prepare($marketplaceSQL);
     $stmt->execute();
     $marketplaces = $stmt->fetchAll(PDO::FETCH_ASSOC);
