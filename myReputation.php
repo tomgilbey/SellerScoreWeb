@@ -27,6 +27,13 @@ try
     $stmt->execute([':userID' => $userID]);
     $reputations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    if (empty($reputations)) {
+        echo "<p class='text-danger'>No reputation data available.</p>";
+        echo "</div>";
+        echo makeFooter();
+        echo makePageEnd();
+        exit();
+    }
 
     $latestRep = $reputations[0];
 
@@ -67,8 +74,6 @@ catch (Exception $e)
 {
     echo "Error: " . $e->getMessage();
 }
-
-
 
 echo "<h2 class='mt-4'>Review Score Distributions</h2>";
 echo "<canvas id='reviewChart' class='mb-4'></canvas>";
@@ -167,6 +172,6 @@ const borderColorPalette = [
 });
 </script>
 <?php
-echo makeFooter("This is the footer");
+echo makeFooter();
 echo makePageEnd();
 ?>

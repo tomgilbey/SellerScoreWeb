@@ -80,6 +80,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <?php
 echo "</div>\n";
 echo "</div>\n";
-echo makeFooter("This is the footer");
+echo makeFooter();
 echo makePageEnd();
 ?>

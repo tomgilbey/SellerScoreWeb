@@ -43,6 +43,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <?php
 echo "</div>";
 echo "</div>";
-echo makeFooter("This is the footer");
+echo makeFooter();
 echo makePageEnd();
 ?>

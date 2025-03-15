@@ -42,7 +42,8 @@ catch (Exception $e)
 
 echo "<div class='container-fluid text-center mb-5'>\n";
 echo "    <h1 class='mb-4'>Manage your Account</h1>\n";
-echo "    <p>Here you can manage your account details and settings.</p>\n";
+echo "    <p>Here you can manage your account details and settings. If you wish to update your details simply edit them on the left side of the page and enter your current password and submit!</p>\n";
+echo "    <p>If you wish to link a marketplace account, select the marketplace from the dropdown on the right side of the page and enter your username for that marketplace and click 'Link Account'. We do the rest!</p>\n";
 echo "    <div class='row justify-content-center'>\n"; // Open row
 
 // LEFT SIDE: Account Information
@@ -174,6 +175,6 @@ echo "</div>\n"; // Close container
 
 
 
-echo makeFooter("This is the footer");
+echo makeFooter();
 echo makePageEnd();
 ?>

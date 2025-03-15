@@ -51,7 +51,7 @@ if (isset($_GET['account']) && !empty(trim($_GET['account'])))
                         'marketplaces' => []
                     ];
                 }
-                if ($user['marketplaceUsername'] && $user['marketplaceName']) {
+                if ($user['marketplaceUsername'] && $user['marketplaceName'] && stripos($user['marketplaceUsername'], $searchTerm) !== false) {
                     $users[$userID]['marketplaces'][] = [
                         'marketplaceUsername' => $user['marketplaceUsername'],
                         'marketplaceName' => $user['marketplaceName']
@@ -96,6 +96,6 @@ else
 
 echo "</div>";
 
-echo makeFooter("This is the footer");
+echo makeFooter();
 echo makePageEnd();
 ?>
