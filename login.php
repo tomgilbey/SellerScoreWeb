@@ -22,10 +22,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
       
     <?php
-        if(!empty($errors)) {
+        if (!empty($errors)) {
             echo "<div class='alert alert-danger' role='alert'>";
             foreach ($errors as $error) {
-              echo "<p>$error</p>";
+                echo "<p>$error</p>";
             }
             echo "</div>";
         }
@@ -34,11 +34,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <input type="text" name="username" id="inputUsername" class="form-control" placeholder="Username"
         value="<?php echo htmlspecialchars($input['username']); ?>" required autofocus>
 
-      <label for="inputPassword" class="sr-only">Password</label>
-      <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required>
+    <label for="inputPassword" class="sr-only">Password</label>
+    <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required>
       
-      <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-    </form>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+</form>
 
 <?php
 echo "</div>";

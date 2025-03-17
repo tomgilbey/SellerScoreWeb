@@ -29,15 +29,13 @@ $SQL = "INSERT INTO userMarketplace (userID, marketplaceID, marketplaceUsername)
 $stmt = $dbConn->prepare($SQL);
 $stmt->execute([':userID' => $userID, ':marketplaceID' => $marketplaceID, ':marketplaceUsername' => $marketplaceUsername]);
 
-if ($stmt->rowCount())
-{
+if ($stmt->rowCount()) {
     $_SESSION['success'] = "Marketplace account added successfully.";
     header("Location: manageAccount.php");
     exit();
-}
-else
-{
+} else {
     $_SESSION['error'] = "Marketplace account could not be added.";
     header("Location: manageAccount.php");
     exit();
 }
+?>

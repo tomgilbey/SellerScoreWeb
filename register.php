@@ -2,8 +2,8 @@
 require_once("functions.php");
 echo makePageStart("Register an Account");
 echo makeNavBar();
-echo"<div class='container'>\n";
-echo"<div class='box'>\n";
+echo "<div class='container'>\n";
+echo "<div class='box'>\n";
 
 $errors = [];
 $input = [
@@ -12,17 +12,16 @@ $input = [
     'username' => '',
     'email' => '',
     'dob' => '',
-    'password' => ''    
+    'password' => ''
 ];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     list($input, $errors) = validate_registration();
-    
+
     if (empty($errors)) {
         header("Location: login.php"); // Redirect to homepage
         exit();
     }
-
 }
 ?>
 
@@ -30,18 +29,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <h1 class="h3 mb-3 font-weight-normal">Create a new Account!</h1>
 
     <?php
-        if(!empty($errors)) {
-            echo "<div class='alert alert-danger' role='alert'>\n";
-            foreach ($errors as $error) {
-              echo "<p>$error</p>\n";
-            }
-            echo "</div>";
+    if (!empty($errors)) {
+        echo "<div class='alert alert-danger' role='alert'>\n";
+        foreach ($errors as $error) {
+            echo "<p>$error</p>\n";
         }
-        ?>
+        echo "</div>";
+    }
+    ?>
     <div class="mb-3">
-    <label for="inputFirstName" class="sr-only">First Name</label>
-    <input type="text" name="first_name" id="inputFirstName" class="form-control" placeholder="First Name"
-        value="<?php echo htmlspecialchars($input['first_name']); ?>" required autofocus>
+        <label for="inputFirstName" class="sr-only">First Name</label>
+        <input type="text" name="first_name" id="inputFirstName" class="form-control" placeholder="First Name"
+            value="<?php echo htmlspecialchars($input['first_name']); ?>" required autofocus>
     </div>
 
     <div class="mb-3">
@@ -74,7 +73,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
     <button class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
-
 </form>
 
 <?php

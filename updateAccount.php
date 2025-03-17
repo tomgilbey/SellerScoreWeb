@@ -20,7 +20,7 @@ if (empty($username) || empty($firstName) || empty($lastName) || empty($email) |
 }
 
 $dbConn = getConnection();
-$SQL = "SELECT HashedPassword FROM Users WHERE userID =  :userID";
+$SQL = "SELECT HashedPassword FROM Users WHERE userID = :userID";
 $stmt = $dbConn->prepare($SQL);
 $stmt->execute([':userID' => $userID]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -31,28 +31,22 @@ if (!$user || !password_verify($currentPassword, $user['HashedPassword'])) {
     exit();
 }
 
-if(!empty($newPassword))
-{
+if (!empty($newPassword)) {
     $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
     $SQL = "UPDATE Users SET Username = :username, FirstName = :firstName, Surname = :lastName, Email = :email, DateOfBirth = :dateOfBirth, HashedPassword = :hashedPassword WHERE userID = :userID";
     $stmt = $dbConn->prepare($SQL);
     $stmt->execute([':username' => $username, ':firstName' => $firstName, ':lastName' => $lastName, ':email' => $email, ':dateOfBirth' => $dateOfBirth, ':hashedPassword' => $hashedPassword, ':userID' => $userID]);
-}
-else
-{
+} else {
     $SQL = "UPDATE Users SET Username = :username, FirstName = :firstName, Surname = :lastName, Email = :email, DateOfBirth = :dateOfBirth WHERE userID = :userID";
     $stmt = $dbConn->prepare($SQL);
     $stmt->execute([':username' => $username, ':firstName' => $firstName, ':lastName' => $lastName, ':email' => $email, ':dateOfBirth' => $dateOfBirth, ':userID' => $userID]);
 }
 
-if ($stmt->rowCount())
-{
+if ($stmt->rowCount()) {
     $_SESSION['success'] = "Account updated successfully.";
     header("Location: manageAccount.php");
     exit();
-}
-else
-{
+} else {
     $_SESSION['error'] = "Account could not be updated.";
     header("Location: manageAccount.php");
     exit();

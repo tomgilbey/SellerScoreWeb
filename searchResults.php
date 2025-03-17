@@ -6,8 +6,7 @@ echo makeNavBar();
 echo "<div class='container'>";
 echo "<h2>Search Results</h2>";
 
-if (isset($_GET['account']) && !empty(trim($_GET['account'])))
-{
+if (isset($_GET['account']) && !empty(trim($_GET['account']))) {
     $searchTerm = trim($_GET['account']);
 
     try {
@@ -38,8 +37,7 @@ if (isset($_GET['account']) && !empty(trim($_GET['account'])))
         $stmt->execute([':searchTerm' => "%$searchTerm%"]);
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        if($results)
-        {
+        if ($results) {
             $users = [];
             foreach ($results as $user) {
                 $userID = $user['userID'];
@@ -78,9 +76,7 @@ if (isset($_GET['account']) && !empty(trim($_GET['account'])))
                       </li>";
             }
             echo "</ul>";
-        }
-        else
-        {
+        } else {
             echo "<p>No results found for <strong>$searchTerm</strong></p>";
         }
 
@@ -88,9 +84,7 @@ if (isset($_GET['account']) && !empty(trim($_GET['account'])))
         echo "<p class='text-danger'>Error fetching search results: " . $e->getMessage() . "</p>";
     }
 
-}
-else
-{
+} else {
     echo "<p class='text-danger'>No search term provided</p>";
 }
 

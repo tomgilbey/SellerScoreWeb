@@ -34,47 +34,45 @@ try {
     // Update Feedback
     if ($action == "updateFeedback" && $_SERVER['REQUEST_METHOD'] == "POST") {
         $data = json_decode(file_get_contents("php://input"), true);
-    
+
         // Log received data for debugging
         error_log(print_r($data, true));
-    
+
         // Check if $data is an array and has entries
         if (!is_array($data) || empty($data)) {
             echo json_encode(["error" => "Invalid or empty input data"]);
             exit;
         }
-    
+
         foreach ($data as $entry) {
             // Ensure all required fields are present
             if (!isset($entry['userID']) || !isset($entry['feedback']) || !isset($entry['writtenBy']) || !isset($entry['feedbackOriginID'])) {
                 echo json_encode(["error" => "Missing required fields in the request"]);
                 exit;
             }
-    
+
             // Validate Inputs
             $entry['starRating'] = filter_var($entry['starRating'], FILTER_VALIDATE_FLOAT);
             $entry['userID'] = filter_var($entry['userID'], FILTER_VALIDATE_INT);
             $entry['feedbackOriginID'] = filter_var($entry['feedbackOriginID'], FILTER_VALIDATE_INT);
             $entry['dateWritten'] = date("Y-m-d H:i:s", strtotime($entry['dateWritten']));
 
-    
             if ($entry['userID'] === false || empty($entry['feedback']) || empty($entry['writtenBy']) || $entry['feedbackOriginID'] === false) {
                 echo json_encode(["error" => "Invalid input data"]);
                 exit;
             }
-    
+
             // Insert feedback into the Feedback table
             $stmt = $connection->prepare("INSERT INTO Feedback (userID, starRating, textFeedback, marketplaceID, writtenBy, dateWritten) VALUES (?, ?, ?, ?, ?, ?)");
             $stmt->execute([$entry['userID'], $entry['starRating'], $entry['feedback'], $entry['feedbackOriginID'], $entry['writtenBy'], $entry['dateWritten']]);
-    
+
             // Update lastRetrieval field in userMarketplace table
             $updateStmt = $connection->prepare("UPDATE userMarketplace SET lastRetrieval = NOW() WHERE userID = ? AND marketplaceID = ?");
             $updateStmt->execute([$entry['userID'], $entry['feedbackOriginID']]);
         }
-    
+
         echo json_encode(["success" => true, "message" => "Feedback added and lastRetrieval updated!"]);
     }
-    
 
     // Retrieve User Marketplace Data
     elseif ($action == "getNewUserMarketplace" && $_SERVER['REQUEST_METHOD'] == "GET") {
@@ -104,16 +102,14 @@ try {
     elseif ($action == "getUserRatings" && $_SERVER['REQUEST_METHOD'] == "GET") {
         $stmt = $connection->prepare("SELECT starRating from Feedback WHERE userID = ?");
         $stmt->execute([$userID]);
-        $stmt->execute();
         $userRatings = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
         echo json_encode($userRatings);
     }
 
-    elseif ($action == "addReputations" && $_SERVER['REQUEST_METHOD'] == "POST") 
-    {
+    elseif ($action == "addReputations" && $_SERVER['REQUEST_METHOD'] == "POST") {
         $data = json_decode(file_get_contents("php://input"), true);
-        
+
         echo json_encode(["received_data" => $data]);
         // Log received data for debugging
         error_log(print_r($data, true));
@@ -123,7 +119,7 @@ try {
             echo json_encode(["error" => "Invalid or empty input data"]);
             exit;
         }
-        
+
         foreach ($data as $entry) {
             // Ensure all required fields are present
             if (!isset($entry['UserID']) || !isset($entry['TotalReviews']) || !isset($entry['AverageRating'])) {
@@ -145,10 +141,11 @@ try {
             // Insert reputation into the userReputation table
             $stmt = $connection->prepare("INSERT INTO userReputation (userID, averageRating, totalReviews, updated) VALUES (?, ?, ?, NOW())");
             $stmt->execute([$entry['UserID'], $entry['AverageRating'], $entry['TotalReviews']]);
+        }
+
+        echo json_encode(["success" => true, "message" => "User reputations added!"]);
     }
 
-    echo json_encode(["success" => true, "message" => "User reputations added!"]);
-    }
     elseif ($action == "getUserReputation" && $_SERVER['REQUEST_METHOD'] == "GET") {
         $stmt = $connection->prepare("SELECT * FROM userReputation where UserID = ? ORDER BY ReputationID DESC LIMIT 1");
         $stmt->execute([$userID]);

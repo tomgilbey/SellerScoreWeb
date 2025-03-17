@@ -40,13 +40,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo "<div class='card mb-3 shadow-sm'>\n";
             echo "<div class='card-body'>\n";
             echo "<h5 class='card-title'>" . str_repeat("⭐", $review['starRating']) . "</h5>\n";
-            echo "<h6 class='card-subtitle mb-2 text-dark'>From {$review['marketplaceName']}  on " . date("d M Y", strtotime($review['dateWritten'])) . "</h6>\n";      
+            echo "<h6 class='card-subtitle mb-2 text-dark'>From {$review['marketplaceName']} on " . date("d M Y", strtotime($review['dateWritten'])) . "</h6>\n";
             echo "<p class='card-text'>{$review['textFeedback']}</p>\n";
             echo "<p class='text-dark'><small>By <strong>{$review['writtenBy']}</strong></small></p>\n";
             if (!empty($review['Reply'])) {
-                echo "<p class= 'card-text'>Reply: {$review['Reply']}</p>\n";            
+                echo "<p class='card-text'>Reply: {$review['Reply']}</p>\n";
             }
-            
+
             if (isset($_SESSION['userID']) && $_SESSION['userID'] == $userID && empty($review['Reply'])) {
                 echo "<button class='btn btn-primary' onclick='showReplyBox({$review['feedbackID']})'>Reply</button>\n";
                 echo "<div id='reply-box-{$review['feedbackID']}' style='display:none; margin-top:10px;'>\n";

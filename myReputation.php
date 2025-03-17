@@ -9,8 +9,7 @@ echo "<p>Here you can see a more detailed breakdown of your reputation.</p>";
 
 $userID = $_SESSION['userID'];
 
-try
-{
+try {
     $dbConn = getConnection();
     $reviewSQL = "SELECT starRating, marketplaceID, COUNT(*) as count FROM Feedback WHERE userID = :userID GROUP BY starRating, marketplaceID";
     $stmt = $dbConn->prepare($reviewSQL);
@@ -36,7 +35,6 @@ try
     }
 
     $latestRep = $reputations[0];
-
     $historyData = array_slice($reputations, 1);
 
     $starRatings = [1, 2, 3, 4, 5]; 
@@ -44,14 +42,12 @@ try
     $marketplaceIDs = array_keys($marketplaceNames);
 
     $reviewData = [];
-    foreach ($starRatings as $star)
-    {
+    foreach ($starRatings as $star) {
         $reviewData[$star] = array_fill_keys($marketplaceIDs, 0);
         $reviewData[$star]['Total'] = 0;
     }
 
-    foreach ($reviews as $review)
-    {
+    foreach ($reviews as $review) {
         $marketplaceID = $review['marketplaceID'];
         $count = $review['count'];
         $reviewData[$review['starRating']][$marketplaceID] = $count;
@@ -61,17 +57,14 @@ try
     $historyTimestamps = [];
     $historyRatings = [];
 
-    foreach ($historyData as $history)
-    {
+    foreach ($historyData as $history) {
         $historyTimestamps[] = $history['updated'];
         $historyRatings[] = $history['averageRating'];
     }
 
     $averageRating = $latestRep['averageRating'] ?? 0;
     $totalReviews = $latestRep['totalReviews'] ?? 0;
-}
-catch (Exception $e)
-{
+} catch (Exception $e) {
     echo "Error: " . $e->getMessage();
 }
 
@@ -88,6 +81,9 @@ echo "<div class='table-responsive'>";
 echo "<table class='table table-striped table-bordered'>";
 echo "<thead class='thead-dark'><tr><th>Timestamp</th><th>Average Rating</th></tr></thead>";
 echo "<tbody>";
+
+// Display the latest reputation first
+echo "<tr><td>" . date("d M Y H:i", strtotime($latestRep['updated'])) . "</td><td>" . number_format($latestRep['averageRating'], 2) . "</td></tr>";
 
 foreach ($historyData as $row) {
     echo "<tr><td>" . date("d M Y H:i", strtotime($row['updated'])) . "</td><td>" . number_format($row['averageRating'], 2) . "</td></tr>";

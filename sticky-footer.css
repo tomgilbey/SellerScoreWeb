@@ -6,11 +6,6 @@
   flex-shrink: 0;
 }
 
-
-/* Custom page CSS
--------------------------------------------------- */
-/* Not required for template or sticky footer method. */
-
 .container {
   width: 100%;
   max-width: 680px;
