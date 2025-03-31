@@ -1,4 +1,9 @@
 <?php
+/**
+ * Handles submitting replies to user reviews.
+ * Updates the database with the reply content.
+ */
+
 require_once("functions.php");
 session_start();
 
@@ -15,6 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['userID'])) {
 
     try {
         $dbConn = getConnection();
+
+        // Update the feedback with the reply
         $SQL = "UPDATE Feedback SET Reply = :reply WHERE feedbackID = :feedbackID";
         $stmt = $dbConn->prepare($SQL);
         $stmt->execute([':reply' => $reply, ':feedbackID' => $feedbackID]);

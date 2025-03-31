@@ -1,9 +1,16 @@
 <?php
 
+// Enable error reporting for debugging purposes
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+/**
+ * Displays a list of error messages.
+ *
+ * @param array $errors An array of error messages.
+ * @return string HTML output of the error messages.
+ */
 function show_errors($errors) {
     echo "<h1 class='error-heading'>Errors</h1>\n";
     $output = "";
@@ -13,6 +20,12 @@ function show_errors($errors) {
     return $output;
 }
 
+/**
+ * Establishes a connection to the database.
+ *
+ * @return PDO The database connection object.
+ * @throws Exception If the connection fails.
+ */
 function getConnection() {
     try {
         $connection = new PDO("mysql:host=nuwebspace_db; dbname=w22002938", "w22002938", "exJbLChc");
@@ -23,6 +36,12 @@ function getConnection() {
     }
 }
 
+/**
+ * Generates the start of an HTML page, including the head and opening body tag.
+ *
+ * @param string $title The title of the page.
+ * @return string HTML output for the page start.
+ */
 function makePageStart($title) {
     session_start();
     return <<<HTML
@@ -50,6 +69,11 @@ function makePageStart($title) {
 HTML;
 }
 
+/**
+ * Generates the navigation bar for the website.
+ *
+ * @return string HTML output for the navigation bar.
+ */
 function makeNavBar() {
     $currentPage = basename($_SERVER['PHP_SELF']);
     $output = <<<HTML
@@ -131,6 +155,11 @@ HTML;
     return $output;
 }
 
+/**
+ * Generates the footer for the website.
+ *
+ * @return string HTML output for the footer.
+ */
 function makeFooter() {
     return <<<HTML
     <footer class="footer bg-dark text-white mt-5">
@@ -173,6 +202,11 @@ function makeFooter() {
 HTML;
 }
 
+/**
+ * Generates the closing tags for an HTML page.
+ *
+ * @return string HTML output for the page end.
+ */
 function makePageEnd() {
     return <<<HTML
         <script>
@@ -191,11 +225,24 @@ function makePageEnd() {
 HTML;
 }
 
+/**
+ * Sets a session variable.
+ *
+ * @param string $key The session key.
+ * @param mixed $value The value to store in the session.
+ * @return bool True if the session variable was set.
+ */
 function set_session($key, $value) {
     $_SESSION[$key] = $value;
     return true;
 }
 
+/**
+ * Retrieves a session variable.
+ *
+ * @param string $key The session key.
+ * @return mixed|null The session value, or null if not set.
+ */
 function get_session($key) {
     if (isset($_SESSION[$key])) {
         return $_SESSION[$key];
@@ -203,6 +250,11 @@ function get_session($key) {
     return null;
 }
 
+/**
+ * Checks if the user is logged in.
+ *
+ * @return bool True if the user is logged in, false otherwise.
+ */
 function check_login() {
     if (get_session('logged-in')) {
         return true;
@@ -210,6 +262,9 @@ function check_login() {
     return false;
 }
 
+/**
+ * Redirects the user to the login page if they are not logged in.
+ */
 function loggedIn() {
     if (!check_login()) {
         header('Location: login.php');
@@ -217,6 +272,9 @@ function loggedIn() {
     }
 }
 
+/**
+ * Logs the user out by clearing the session and redirecting to the homepage.
+ */
 function logOut() {
     $_SESSION = array();
     session_destroy();
@@ -224,6 +282,11 @@ function logOut() {
     exit();
 }
 
+/**
+ * Validates the login form input and checks the credentials against the database.
+ *
+ * @return array An array containing the sanitized input and any validation errors.
+ */
 function validate_login() {
     $input = array();
     $errors = array();
@@ -256,6 +319,11 @@ function validate_login() {
     return array($input, $errors);
 }
 
+/**
+ * Validates the registration form input and creates a new user in the database.
+ *
+ * @return array An array containing the sanitized input and any validation errors.
+ */
 function validate_registration() {
     $errors = [];
     $input = [

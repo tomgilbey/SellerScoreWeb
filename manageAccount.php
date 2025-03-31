@@ -1,12 +1,15 @@
 <?php
 /**
- * @autho Tom Gilbey
+ * Displays the account management page.
+ * Allows users to update their account details and link marketplace accounts.
  */
+
 require_once("functions.php");
 echo makePageStart("Manage your Account");
 echo makeNavBar();
 loggedIn();
 
+// Display success or error messages
 if (isset($_SESSION['success'])) {
     echo "<div class='alert alert-success'>" . $_SESSION['success'] . "</div>";
     unset($_SESSION['success']);
@@ -19,16 +22,20 @@ $userID = $_SESSION['userID'];
 
 try {
     $dbConn = getConnection();
+
+    // Fetch user details
     $SQL = "SELECT * FROM Users WHERE userID = :userID";
     $stmt = $dbConn->prepare($SQL);
     $stmt->execute([':userID' => $userID]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    // Fetch linked marketplace accounts
     $marketplaceSQL = "SELECT * FROM userMarketplace WHERE userID = :userID";
     $stmt = $dbConn->prepare($marketplaceSQL);
     $stmt->execute([':userID' => $userID]);
     $marketplaceLinks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    // Fetch available marketplaces
     $marketplacesSQL = "SELECT * FROM Marketplace";
     $stmt = $dbConn->prepare($marketplacesSQL);
     $stmt->execute();

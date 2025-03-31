@@ -1,16 +1,20 @@
 <?php
+/**
+ * Displays the user's reputation details.
+ * Includes review distributions, overall reputation, and reputation history.
+ */
+
 require_once("functions.php");
-echo makePageStart("My Reputation") . "\n";
+echo makePageStart("My Reputation");
 loggedIn();
-echo makeNavBar() . "\n";
-echo "<div class='container mt-5'>\n";
-echo "<h1>My Reputation</h1>\n";
-echo "<p>Here you can see a more detailed breakdown of your reputation.</p>\n";
+echo makeNavBar();
 
 $userID = $_SESSION['userID'];
 
 try {
     $dbConn = getConnection();
+
+    // Fetch review data
     $reviewSQL = "SELECT starRating, marketplaceID, COUNT(*) as count FROM Feedback WHERE userID = :userID GROUP BY starRating, marketplaceID";
     $stmt = $dbConn->prepare($reviewSQL);
     $stmt->execute([':userID' => $userID]);
@@ -21,6 +25,7 @@ try {
     $stmt->execute();
     $marketplaces = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    // Fetch reputation history
     $reputationSQL = "SELECT averageRating, totalReviews, updated FROM userReputation WHERE userID = :userID ORDER BY updated DESC";
     $stmt = $dbConn->prepare($reputationSQL);
     $stmt->execute([':userID' => $userID]);
@@ -67,6 +72,10 @@ try {
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage() . "\n";
 }
+
+echo "<div class='container mt-5'>\n";
+echo "<h1>My Reputation</h1>\n";
+echo "<p>Here you can see a more detailed breakdown of your reputation.</p>\n";
 
 echo "<h2 class='mt-4'>Review Score Distributions</h2>\n";
 echo "<canvas id='reviewChart' class='mb-4'></canvas>\n";

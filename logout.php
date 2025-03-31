@@ -1,10 +1,9 @@
 <?php
-// Start the session
+/**
+ * Logs the user out by clearing the session and redirecting to the homepage.
+ */
+
 session_start();
-
-// Include the function definitions
 require_once("functions.php");
-
-// Call the logOut function to handle the logout
 logOut();
 ?>

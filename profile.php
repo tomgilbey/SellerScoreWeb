@@ -1,4 +1,9 @@
 <?php
+/**
+ * Displays the profile and reputation of a specific user.
+ * Includes linked marketplace accounts and user reviews.
+ */
+
 require_once("functions.php");
 echo makePageStart("Profile");
 echo makeNavBar();

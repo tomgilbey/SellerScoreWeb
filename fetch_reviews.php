@@ -1,6 +1,12 @@
 <?php
+/**
+ * Fetches and displays reviews for a specific user based on filters.
+ * Supports sorting and filtering by marketplace.
+ */
+
 require_once("functions.php");
 session_start();
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $dbConn = getConnection();
 
@@ -8,6 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sort = $_POST['sort'] ?? 'recent';
     $marketplace = $_POST['marketplace'] ?? 'all';
 
+    // Determine sorting order
     $orderClause = "ORDER BY f.dateWritten DESC";
     if ($sort === 'oldest') {
         $orderClause = "ORDER BY f.dateWritten ASC";
@@ -17,14 +24,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $orderClause = "ORDER BY f.starRating ASC";
     }
 
+    // Filter by marketplace
     $marketplaceClause = "";
     $params = [':userID' => $userID];
-
     if ($marketplace !== 'all') {
         $marketplaceClause = "AND m.marketplaceName = :marketplace";
         $params[':marketplace'] = $marketplace;
     }
 
+    // Fetch reviews from the database
     $SQL = "SELECT f.*, m.marketplaceName 
             FROM Feedback f 
             LEFT JOIN Marketplace m ON f.marketplaceID = m.marketplaceID 
@@ -35,6 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute($params);
     $feedback = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    // Display reviews
     if (!empty($feedback)) {
         foreach ($feedback as $review) {
             echo "<div class='card mb-3 shadow-sm'>\n";
@@ -47,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 echo "<p class='card-text'>Reply: {$review['Reply']}</p>\n";
             }
 
+            // Allow the user to reply to reviews
             if (isset($_SESSION['userID']) && $_SESSION['userID'] == $userID && empty($review['Reply'])) {
                 echo "<button class='btn btn-primary' onclick='showReplyBox({$review['feedbackID']})'>Reply</button>\n";
                 echo "<div id='reply-box-{$review['feedbackID']}' style='display:none; margin-top:10px;'>\n";

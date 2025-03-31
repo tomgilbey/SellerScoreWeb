@@ -1,13 +1,20 @@
 <?php
 /**
- * @autho Tom Gilbey
+ * Displays the homepage for sellers.
+ * Allows users to search for accounts and provides instructions for sellers.
  */
+
 require_once("functions.php");
+
+// Generate the page start and navigation bar
 echo makePageStart("Home Page");
 echo makeNavBar();
 ?>
+
+<!-- Main content -->
 <div class='container text-center'>
     <h1>SellerScore</h1>
+    <!-- Search form -->
     <form class="form-inline d-flex justify-content-center" action="searchResults.php" method="GET">
         <div class="input-group" style="width: 100%;">
             <input class="form-control" type="text" name="account" id="searchInput" 
@@ -19,9 +26,11 @@ echo makeNavBar();
             </div>
         </div>
     </form>
+    <!-- Search results container -->
     <div id="searchResults" class="list-group position-absolute text-center" style="width: 40%; left: 50%; transform: translateX(-50%); z-index: 1000;"></div>
 </div>
 
+<!-- Link to buyer page -->
 <div class="container text-center mt-3">
     <div class="row justify-content-center">
         <div class="col-md-6">
@@ -30,6 +39,7 @@ echo makeNavBar();
     </div>
 </div>
 
+<!-- Instructions for sellers -->
 <div class="container-fluid mt-5">
     <h2 class="text-center">Getting Started!</h2>
     <div class="row">
@@ -54,6 +64,7 @@ echo makeNavBar();
 </div> 
 
 <?php
+// Generate the footer and page end
 echo makeFooter();
 echo makePageEnd();
 ?>

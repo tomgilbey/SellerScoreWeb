@@ -1,4 +1,9 @@
 <?php
+/**
+ * Handles user registration.
+ * Validates input and creates a new user account in the database.
+ */
+
 require_once("functions.php");
 echo makePageStart("Register an Account");
 echo makeNavBar();
@@ -16,10 +21,11 @@ $input = [
 ];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Validate registration input
     list($input, $errors) = validate_registration();
 
     if (empty($errors)) {
-        header("Location: login.php"); // Redirect to homepage
+        header("Location: login.php"); // Redirect to login page
         exit();
     }
 }

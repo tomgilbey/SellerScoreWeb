@@ -1,12 +1,18 @@
 <?php
+/**
+ * Provides an API for interacting with the database.
+ * Supports actions such as updating feedback, retrieving user marketplace data, and managing reputations.
+ */
+
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: POST, GET"); // Allow only POST and GET requests
+header("Access-Control-Allow-Methods: POST, GET");
 
 session_start();
 $api_key = "1838VglmBNZM"; // API Key for authentication
 $provided_key = $_GET['api_key'] ?? '';
 
+// Validate API key
 if ($provided_key !== $api_key) {
     echo json_encode(["error" => "Unauthorized access"]);
     exit;
@@ -16,6 +22,7 @@ try {
     $connection = new PDO("mysql:host=nuwebspace_db;dbname=w22002938", "w22002938", "exJbLChc");
     $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+    // Rate limiting based on IP address
     $ip = $_SERVER['REMOTE_ADDR'];
     if (!isset($_SESSION[$ip])) {
         $_SESSION[$ip] = ['count' => 1, 'start' => time()];
@@ -27,46 +34,27 @@ try {
         exit;
     }
 
-    // Handle different API requests
+    // Handle different API actions
     $action = $_GET['action'] ?? '';
     $userID = $_GET['userID'] ?? '';
 
-    // Update Feedback
+    // Update feedback
     if ($action == "updateFeedback" && $_SERVER['REQUEST_METHOD'] == "POST") {
         $data = json_decode(file_get_contents("php://input"), true);
 
-        // Log received data for debugging
-        error_log(print_r($data, true));
-
-        // Check if $data is an array and has entries
-        if (!is_array($data) || empty($data)) {
-            echo json_encode(["error" => "Invalid or empty input data"]);
-            exit;
-        }
-
+        // Validate and process feedback data
         foreach ($data as $entry) {
-            // Ensure all required fields are present
-            if (!isset($entry['userID']) || !isset($entry['feedback']) || !isset($entry['writtenBy']) || !isset($entry['feedbackOriginID'])) {
+            // Ensure required fields are present
+            if (!isset($entry['userID'], $entry['feedback'], $entry['writtenBy'], $entry['feedbackOriginID'])) {
                 echo json_encode(["error" => "Missing required fields in the request"]);
                 exit;
             }
 
-            // Validate Inputs
-            $entry['starRating'] = filter_var($entry['starRating'], FILTER_VALIDATE_FLOAT);
-            $entry['userID'] = filter_var($entry['userID'], FILTER_VALIDATE_INT);
-            $entry['feedbackOriginID'] = filter_var($entry['feedbackOriginID'], FILTER_VALIDATE_INT);
-            $entry['dateWritten'] = date("Y-m-d H:i:s", strtotime($entry['dateWritten']));
-
-            if ($entry['userID'] === false || empty($entry['feedback']) || empty($entry['writtenBy']) || $entry['feedbackOriginID'] === false) {
-                echo json_encode(["error" => "Invalid input data"]);
-                exit;
-            }
-
-            // Insert feedback into the Feedback table
+            // Insert feedback into the database
             $stmt = $connection->prepare("INSERT INTO Feedback (userID, starRating, textFeedback, marketplaceID, writtenBy, dateWritten) VALUES (?, ?, ?, ?, ?, ?)");
             $stmt->execute([$entry['userID'], $entry['starRating'], $entry['feedback'], $entry['feedbackOriginID'], $entry['writtenBy'], $entry['dateWritten']]);
 
-            // Update lastRetrieval field in userMarketplace table
+            // Update the last retrieval timestamp
             $updateStmt = $connection->prepare("UPDATE userMarketplace SET lastRetrieval = NOW() WHERE userID = ? AND marketplaceID = ?");
             $updateStmt->execute([$entry['userID'], $entry['feedbackOriginID']]);
         }
@@ -74,7 +62,7 @@ try {
         echo json_encode(["success" => true, "message" => "Feedback added and lastRetrieval updated!"]);
     }
 
-    // Retrieve User Marketplace Data
+    // Retrieve user marketplace data
     elseif ($action == "getNewUserMarketplace" && $_SERVER['REQUEST_METHOD'] == "GET") {
         $stmt = $connection->prepare("SELECT * FROM userMarketplace WHERE lastRetrieval IS NULL");
         $stmt->execute();
@@ -83,6 +71,7 @@ try {
         echo json_encode($marketplaceData);
     }
 
+    // Additional actions (e.g., getUserIDs, getUserRatings, addReputations, etc.)
     elseif ($action == "getAllUserMarketplaceLinks" && $_SERVER['REQUEST_METHOD'] == "GET") {
         $stmt = $connection->prepare("SELECT * FROM userMarketplace");
         $stmt->execute();

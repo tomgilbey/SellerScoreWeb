@@ -1,4 +1,9 @@
 <?php
+/**
+ * Displays search results for user accounts.
+ * Searches by username or linked marketplace usernames.
+ */
+
 require_once("functions.php");
 echo makePageStart("Search Results");
 echo makeNavBar();
@@ -11,28 +16,14 @@ if (isset($_GET['account']) && !empty(trim($_GET['account']))) {
 
     try {
         $dbConn = getConnection();
-        $SQL = "SELECT 
-                    u.userID,
-                    u.username,
-                    ur.totalReviews,
-                    ur.averageRating,
-                    um.marketplaceUsername,
-                    m.marketplaceName
+
+        // Fetch search results
+        $SQL = "SELECT u.userID, u.username, ur.totalReviews, ur.averageRating, um.marketplaceUsername, m.marketplaceName
                 FROM Users u
-                LEFT JOIN ( 
-                    SELECT userID, totalReviews, averageRating
-                    FROM userReputation
-                    WHERE ReputationID IN (
-                        SELECT MAX(ReputationID) 
-                        FROM userReputation 
-                        GROUP BY userID
-                    )
-                ) ur ON u.userID = ur.userID
+                LEFT JOIN userReputation ur ON u.userID = ur.userID
                 LEFT JOIN userMarketplace um ON u.userID = um.userID
                 LEFT JOIN Marketplace m ON um.marketplaceID = m.marketplaceID
-                WHERE u.username LIKE :searchTerm
-                OR um.marketplaceUsername LIKE :searchTerm";
-        
+                WHERE u.username LIKE :searchTerm OR um.marketplaceUsername LIKE :searchTerm";
         $stmt = $dbConn->prepare($SQL);
         $stmt->execute([':searchTerm' => "%$searchTerm%"]);
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);

@@ -1,4 +1,9 @@
 <?php
+/**
+ * Handles user login.
+ * Validates user credentials and starts a session upon successful login.
+ */
+
 require_once("functions.php");
 echo makePageStart("Login");
 echo makeNavBar();
@@ -9,6 +14,7 @@ $errors = [];
 $input = ['username' => '', 'password' => ''];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Validate login credentials
     list($input, $errors) = validate_login();
 
     if (empty($errors)) {
@@ -22,6 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
       
     <?php
+        // Display errors if any
         if (!empty($errors)) {
             echo "<div class='alert alert-danger' role='alert'>";
             foreach ($errors as $error) {
