@@ -115,6 +115,7 @@ echo "<form action='addMarketplaceAccount.php' method='post'>\n";
 echo "<div class='mb-3'>\n";
 echo "<label for='MarketplaceID' class='form-label'>Select Marketplace:</label>\n";
 echo "<select class='form-control' id='MarketplaceID' name='MarketplaceID' required>\n";
+echo "<option value='' disabled selected>Select a Marketplace</option>\n"; // Placeholder option
 echo "<option value='1'>Amazon</option>\n";
 echo "<option value='2'>eBay</option>\n";
 echo "<option value='3'>Vinted</option>\n";

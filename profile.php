@@ -90,7 +90,7 @@ if (isset($_GET['user']) && !empty(trim($_GET['user']))) {
                     } elseif ($ratingChange < 0) {
                         $changeDisplay = "<span class='badge bg-danger'>↓ " . number_format(abs($ratingChange), 1) . "⭐</span>";
                     } else {
-                        $changeDisplay = "<span class='badge bg-secondary'>→ No Change</span>";
+                        $changeDisplay = "<span class='badge bg-warning'>→ No Change</span>";
                     }
 
                     echo "<h3>Reputation Change Over Time</h3>";
@@ -140,7 +140,7 @@ if (isset($_GET['user']) && !empty(trim($_GET['user']))) {
                     foreach ($marketplaceLinks as $link) {
                         echo "<div class='list-group-item d-flex justify-content-between align-items-center'>";
                         echo "<span>{$link['marketplaceName']}: {$link['marketplaceUsername']}</span>";
-                        echo "<span class='badge bg-secondary'>Active</span>";
+                        echo "<span class='badge bg-success'>Active</span>";
                         echo "</div>";
                     }
                     echo "</div>";
@@ -152,16 +152,16 @@ if (isset($_GET['user']) && !empty(trim($_GET['user']))) {
                 echo "<div class='col-md-5'>";
                 echo "<h2 class='mt-4'>User Reviews</h2>";
                 echo "<form id='reviewFilters' class='mb-3'>";
-                echo "<label for='sortReviews' class='form-label'><strong>Sort by:</strong></label>";
-                echo "<select id='sortReviews' class='form-select mb-2' name='sort'>";
+                echo "<label for='sortReviews' class='form-label mb-2 mr-2'><strong>Sort by:</strong></label>";
+                echo "<select id='sortReviews' class='form-select mb-3 mr-2' name='sort'>";
                 echo "<option value='recent'>Most Recent</option>";
                 echo "<option value='oldest'>Oldest</option>";
                 echo "<option value='highest'>Highest Rating</option>";
                 echo "<option value='lowest'>Lowest Rating</option>";
                 echo "</select>";
 
-                echo "<label for='marketplaceFilter' class='form-label'><strong>Filter by Marketplace:</strong></label>";
-                echo "<select id='marketplaceFilter' class='form-select mb-2' name='marketplace'>";
+                echo "<label for='marketplaceFilter' class='form-label mb-2 mr-2'><strong>Filter by Marketplace:</strong></label>";
+                echo "<select id='marketplaceFilter' class='form-select mb-3 mr-2' name='marketplace'>";
                 echo "<option value='all'>All Marketplaces</option>";
                 echo "<option value='ebay'>eBay</option>";
                 echo "<option value='amazon'>Amazon</option>";
@@ -169,7 +169,7 @@ if (isset($_GET['user']) && !empty(trim($_GET['user']))) {
                 echo "<option value='etsy'>Etsy</option>";
                 echo "</select>";
 
-                echo "<button type='submit' class='btn btn-primary'>Apply Filters</button>";
+                echo "<button type='submit' class='btn btn-primary mb-3'>Apply Filters</button>";
                 echo "</form>";
 
                 echo "<div id='reviewsContainer' class='overflow-auto' style='max-height: 400px; padding-right: 10px; margin-bottom:50px'>";

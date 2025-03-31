@@ -43,9 +43,7 @@ function makePageStart($title) {
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 
         <!-- Custom styles for this template -->
-        <link href="navbar-top.css" rel="stylesheet">
-        <link href="sticky-footer.css" rel="stylesheet">
-        <link href="signin.css" rel="stylesheet">
+        <link href="styles.css" rel="stylesheet">
         
     </head>
     <body>
@@ -56,7 +54,7 @@ function makeNavBar() {
     $currentPage = basename($_SERVER['PHP_SELF']);
     $output = <<<HTML
     <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
-        <a class="navbar-brand" href="#">SellerScore</a>
+        <a class="navbar-brand" href="#"><strong>SellerScore</strong></a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" 
                 aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -67,19 +65,30 @@ function makeNavBar() {
 HTML;
 
     $output .= "\n    <li class='nav-item" . ($currentPage == 'index.php' ? ' active' : '') . "'>
-                    <a class='nav-link' href='index.php'>Home</a>
+                    <a class='nav-link' href='index.php'><strong>Home</strong></a>
                   </li>\n";
-    $output .= "\n<li class='nav-item" . ($currentPage == 'myReputation.php' ? ' active' : '') . "'>
-                    <a class='nav-link' href='myReputation.php'>My Reputation</a>\n
-                  </li>\n";
+
     if (check_login()) {
+        $output .= "\n    <li class='nav-item" . ($currentPage == 'myReputation.php' ? ' active' : '') . "'>
+                      <a class='nav-link' href='myReputation.php'><strong>My Reputation</strong></a>
+                    </li>\n";
         $output .= "\n    <li class='nav-item" . ($currentPage == 'profile.php' ? ' active' : '') . "'>
-                      <a class='nav-link' href='profile.php?user=" . urlencode($_SESSION['username']) . "'>My Profile</a>
+                      <a class='nav-link' href='profile.php?user=" . urlencode($_SESSION['username']) . "'><strong>My Profile</strong></a>
                     </li>\n";
-    } else {
-        $output .= "\n    <li class='nav-item'>
-                      <a class='nav-link' href='login.php'>My Profile</a>
-                    </li>\n";
+    }
+
+    if ($currentPage == 'index.php' && !check_login()){
+        $output .= <<<HTML
+                <li class="nav-item">
+                    <a class="nav-link" href="indexSellers.php"><strong>For Sellers!</strong></a>
+                </li>
+HTML;
+    } elseif ($currentPage == 'indexSellers.php' && !check_login()) {
+        $output .= <<<HTML
+                <li class="nav-item">
+                    <a class="nav-link" href="index.php"><strong>For Buyers!</strong></a>
+                </li>
+HTML;
     }
 
     $output .= <<<HTML
@@ -89,7 +98,9 @@ HTML;
                   <form class="form-inline d-flex" action="searchResults.php" method="GET">
                       <input class="form-control mr-sm-2" type="text" name="account" id="searchInputNavbar" 
                             placeholder="Account Search" aria-label="Search" autocomplete="off">
-                      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                      <button class="btn btn-success my-2 my-sm-0" type="submit" style="height: 70px; color: white; background-color: #116400; border-color: #116400;">
+                          <strong>Search</strong>
+                      </button>
                   </form>
                   <div id="searchResultsNavbar" class="list-group position-absolute w-100" style="z-index: 1000;"></div>
                 </li>
@@ -97,17 +108,17 @@ HTML;
 
     if (check_login()) {
         $output .= "\n    <li class='nav-item" . ($currentPage == 'manage.php' ? ' active' : '') . "'>
-                        <a class='nav-link' href='manageAccount.php'>Manage Account</a>
+                        <a class='nav-link' href='manageAccount.php'><strong>Manage Account</strong></a>
                       </li>\n";
         $output .= "    <li class='nav-item'>
-                        <a class='nav-link' href='logout.php'>Logout</a>
+                        <a class='nav-link' href='logout.php'><strong>Logout</strong></a>
                       </li>\n";
     } else {
         $output .= "\n    <li class='nav-item" . ($currentPage == 'login.php' ? ' active' : '') . "'>
-                        <a class='nav-link' href='login.php'>Login</a>
+                        <a class='nav-link' href='login.php'><strong>Login</strong></a>
                       </li>\n";
         $output .= "\n    <li class='nav-item" . ($currentPage == 'register.php' ? ' active' : '') . "'>
-                        <a class='nav-link' href='register.php'>Register</a>
+                        <a class='nav-link' href='register.php'><strong>Register</strong></a>
                       </li>\n";
     }
 
@@ -266,6 +277,8 @@ function validate_registration() {
         $errors[] = "Username is required.";
     } elseif (strlen($input['username']) < 5) {
         $errors[] = "Username must be at least 5 characters.";
+    } elseif (!preg_match('/^\S+$/', $input['username'])) {
+        $errors[] = "Username cannot contain spaces.";
     }
     if (empty($input['email'])) {
         $errors[] = "Email is required.";
@@ -304,6 +317,14 @@ function validate_registration() {
                     ':dob' => $input['dob'],
                     ':HashedPassword' => password_hash($input['password'], PASSWORD_DEFAULT)
                 ));
+
+                $userID = $dbConn->lastInsertId();
+
+                $sqlReputationQuery = "INSERT INTO userReputation (UserID, AverageRating, TotalReviews, updated) VALUES (:userID, 0, 0, now())";
+                $stmt = $dbConn->prepare($sqlReputationQuery);
+                $stmt->execute([
+                    ':userID' => $userID
+                ]);
             }
         } catch (Exception $e) {
             $errors[] = "There was a problem: " . $e->getMessage();

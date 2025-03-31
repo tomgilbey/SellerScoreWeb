@@ -1,6 +1,6 @@
 <?php
 /**
- * @author Tom Gilbey
+ * @autho Tom Gilbey
  */
 require_once("functions.php");
 echo makePageStart("Home Page");
@@ -25,31 +25,33 @@ echo makeNavBar();
 <div class="container text-center mt-3">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <a href="indexSellers.php" class="btn btn-dark btn-lg btn-block">Not a buyer? Head over to the seller page here!</a>
+            <a href="index.php" class="btn btn-dark btn-lg btn-block">Not a seller? Head over to the buyer page here!</a>
         </div>
     </div>
 </div>
+
 <div class="container-fluid mt-5">
     <h2 class="text-center">Getting Started!</h2>
     <div class="row">
-        <div class="col-12">
+        <div class="col-12 mb-4">
             <div class="card h-100 text-center">
                 <div class="card-body">
-                    <h3 class="card-title">For Buyers</h3>
+                    <h3 class="card-title">For Sellers</h3>
                     <p class="card-text font-weight-bold">
-                        No need to create an account! Just click on the search bar and search for the user whose reputation you wish to view.<br>
-                        <img src="images/Buyer1.png" alt="Buyer Step 1" class="img-fluid mb-3" style="max-width: 75%; height: auto;"><br>
-                        This can be their username here or their marketplace account username, profile, the account is linked!<br>
-                        <img src="images/Buyer2.png" alt="Buyer Step 2" class="img-fluid mb-3" style="max-width: 75%; height: auto;"><br>
-                        When you find the profile you wish to view, just click on the link.<br>
-                        <img src="images/Buyer3.png" alt="Buyer Step 3" class="img-fluid mb-3" style="max-width: 75%; height: auto;"><br>
-                        Now you can view their reputation.<br>
+                        Start by creating a new account.<br>
+                        <img src="images/Seller1.png" alt="Seller Step 1" class="img-fluid mb-3" style="max-width: 75%; height: auto;"><br>
+                        Then, log in with your account.<br>
+                        <img src="images/Seller2.png" alt="Seller Step 2" class="img-fluid mb-3" style="max-width: 75%; height: auto;"><br>
+                        Head over to the manage account section and link your marketplace accounts with the relative username!<br>
+                        <img src="images/Seller3.png" alt="Seller Step 3" class="img-fluid mb-3" style="max-width: 75%; height: auto;"><br>
+                        When you have linked your accounts, we do the rest!<br>
+                        <img src="images/Seller4.png" alt="Seller Step 4" class="img-fluid mb-3" style="max-width: 75%; height: auto;">
                     </p>
                 </div>
             </div>
         </div>
-    </div>
-</div>
+    </div> 
+</div> 
 
 <?php
 echo makeFooter();

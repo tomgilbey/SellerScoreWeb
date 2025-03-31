@@ -1,11 +1,11 @@
 <?php
 require_once("functions.php");
-echo makePageStart("My Reputation");
+echo makePageStart("My Reputation") . "\n";
 loggedIn();
-echo makeNavBar();
-echo "<div class='container mt-5'>";
-echo "<h1>My Reputation</h1>";
-echo "<p>Here you can see a more detailed breakdown of your reputation.</p>";
+echo makeNavBar() . "\n";
+echo "<div class='container mt-5'>\n";
+echo "<h1>My Reputation</h1>\n";
+echo "<p>Here you can see a more detailed breakdown of your reputation.</p>\n";
 
 $userID = $_SESSION['userID'];
 
@@ -27,10 +27,10 @@ try {
     $reputations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     if (empty($reputations)) {
-        echo "<p class='text-danger'>No reputation data available.</p>";
-        echo "</div>";
-        echo makeFooter();
-        echo makePageEnd();
+        echo "<p class='text-danger'>No reputation data available.</p>\n";
+        echo "</div>\n";
+        echo makeFooter() . "\n";
+        echo makePageEnd() . "\n";
         exit();
     }
 
@@ -65,35 +65,43 @@ try {
     $averageRating = $latestRep['averageRating'] ?? 0;
     $totalReviews = $latestRep['totalReviews'] ?? 0;
 } catch (Exception $e) {
-    echo "Error: " . $e->getMessage();
+    echo "Error: " . $e->getMessage() . "\n";
 }
 
-echo "<h2 class='mt-4'>Review Score Distributions</h2>";
-echo "<canvas id='reviewChart' class='mb-4'></canvas>";
+echo "<h2 class='mt-4'>Review Score Distributions</h2>\n";
+echo "<canvas id='reviewChart' class='mb-4'></canvas>\n";
 
-echo "<h2 class='mt-4'>Overall Reputation</h2>";
-echo "<p>Average Rating: <strong>" . number_format($averageRating, 1) . "</strong></p>";
-echo "<p>Total Reviews: <strong>" . $totalReviews . "</strong></p>";
+echo "<h2 class='mt-4'>Overall Reputation</h2>\n";
+echo "<p>Average Rating: <strong>" . number_format($averageRating, 1) . "</strong></p>\n";
+echo "<p>Total Reviews: <strong>" . $totalReviews . "</strong></p>\n";
 
-echo "<h2 class='mt-4'>Averages History</h2>";
-echo "<div id='reviewsContainer' class='overflow-auto' style='max-height: 400px; padding-right: 10px; margin-bottom:50px'>\n"; // Overflow auto to allow scrolling
-echo "<div class='table-responsive'>";
-echo "<table class='table table-striped table-bordered'>";
-echo "<thead class='thead-dark'><tr><th>Timestamp</th><th>Average Rating</th></tr></thead>";
-echo "<tbody>";
+echo "<h2 class='mt-4'>Averages History</h2>\n";
+echo "<div id='reviewsContainer' class='overflow-auto' style='max-height: 400px; padding-right: 10px; margin-bottom:50px'>\n";
+echo "<div class='table-responsive'>\n";
+echo "<table class='table table-striped table-bordered'>\n";
+echo "<thead class='thead-dark'><tr><th>Timestamp</th><th>Average Rating</th></tr></thead>\n";
+echo "<tbody>\n";
 
 // Display the latest reputation first
-echo "<tr><td>" . date("d M Y H:i", strtotime($latestRep['updated'])) . "</td><td>" . number_format($latestRep['averageRating'], 2) . "</td></tr>";
-
-foreach ($historyData as $row) {
-    echo "<tr><td>" . date("d M Y H:i", strtotime($row['updated'])) . "</td><td>" . number_format($row['averageRating'], 2) . "</td></tr>";
+if (!empty($latestRep['updated'])) {
+    echo "<tr><td>" . date("d M Y H:i", strtotime($latestRep['updated'])) . "</td><td>" . number_format($latestRep['averageRating'], 2) . "</td></tr>\n";
+} else {
+    echo "<tr><td>Unknown</td><td>" . number_format($latestRep['averageRating'], 2) . "</td></tr>\n";
 }
 
-echo "</tbody>";
-echo "</table>";
-echo "</div>";
-echo "</div>";
-echo "</div>";
+foreach ($historyData as $row) {
+    if (!empty($row['updated'])) {
+        echo "<tr><td>" . date("d M Y H:i", strtotime($row['updated'])) . "</td><td>" . number_format($row['averageRating'], 2) . "</td></tr>\n";
+    } else {
+        echo "<tr><td>Unknown</td><td>" . number_format($row['averageRating'], 2) . "</td></tr>\n";
+    }
+}
+
+echo "</tbody>\n";
+echo "</table>\n";
+echo "</div>\n";
+echo "</div>\n";
+echo "</div>\n";
 ?>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -104,18 +112,18 @@ echo "</div>";
     const reviewData = <?php echo json_encode($reviewData); ?>;
 
     const colorPalette = [
-    'rgba(0, 0, 255, 0.6)',  
-    'rgba(0, 255, 0, 0.6)',  
-    'rgba(255, 0, 0, 0.6)',  
-    'rgba(255, 165, 0, 0.6)',
-];
+        'rgba(0, 0, 255, 0.6)',  
+        'rgba(0, 255, 0, 0.6)',  
+        'rgba(255, 0, 0, 0.6)',  
+        'rgba(255, 165, 0, 0.6)',
+    ];
 
-const borderColorPalette = [
-    'rgba(0, 0, 255, 1)',    
-    'rgba(0, 255, 0, 1)',    
-    'rgba(255, 0, 0, 1)',    
-    'rgba(255, 165, 0, 1)',  
-];
+    const borderColorPalette = [
+        'rgba(0, 0, 255, 1)',    
+        'rgba(0, 255, 0, 1)',    
+        'rgba(255, 0, 0, 1)',    
+        'rgba(255, 165, 0, 1)',  
+    ];
 
     const datasets = marketplaces.map((name, index) => {
         const marketplaceID = Object.keys(<?php echo json_encode($marketplaceNames); ?>)[index];
@@ -128,7 +136,6 @@ const borderColorPalette = [
         };
     });
 
-    
     datasets.push({
         label: "Total",
         data: starRatings.map(star => reviewData[star]['Total']),
@@ -138,36 +145,36 @@ const borderColorPalette = [
     });
 
     new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: starRatings.map(star => `${star} Stars`),
-        datasets: datasets
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            tooltip: {
-                callbacks: {
-                    title: function () {
-                        return '';
-                    },
-                    label: function (tooltipItem) {
-                        let datasetLabel = tooltipItem.dataset.label || ''; 
-                        let value = tooltipItem.raw || 0; 
-                        return `${datasetLabel}: ${value}`;
+        type: 'bar',
+        data: {
+            labels: starRatings.map(star => `${star} Stars`),
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        title: function () {
+                            return '';
+                        },
+                        label: function (tooltipItem) {
+                            let datasetLabel = tooltipItem.dataset.label || ''; 
+                            let value = tooltipItem.raw || 0; 
+                            return `${datasetLabel}: ${value}`;
+                        }
                     }
                 }
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
             }
         }
-    }
-});
+    });
 </script>
 <?php
-echo makeFooter();
-echo makePageEnd();
+echo makeFooter() . "\n";
+echo makePageEnd() . "\n";
 ?>

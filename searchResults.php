@@ -57,6 +57,10 @@ if (isset($_GET['account']) && !empty(trim($_GET['account']))) {
                 }
             }
 
+            echo "<p>Search results for <strong>$searchTerm</strong></p>";
+            echo "<p>Found <strong>" . count($users) . "</strong> results</p>";
+            echo "<p> Please note that if a user has one name on one marketplace, it does not mean they have the same name on another marketplace!</p>";
+
             echo "<ul class='list-group'>";
             foreach ($users as $user) {
                 echo "<li class='list-group-item'>

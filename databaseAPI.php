@@ -92,7 +92,7 @@ try {
     }
 
     elseif ($action == "getUserIDs" && $_SERVER['REQUEST_METHOD'] == "GET") {
-        $stmt = $connection->prepare("SELECT userID FROM Users");
+        $stmt = $connection->prepare("SELECT userID FROM Users ORDER BY userID ASC");
         $stmt->execute();
         $userIDs = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
