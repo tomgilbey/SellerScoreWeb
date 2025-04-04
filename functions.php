@@ -76,6 +76,9 @@ HTML;
  */
 function makeNavBar() {
     $currentPage = basename($_SERVER['PHP_SELF']);
+    $currentUser = $_SESSION['username'] ?? null; // Get the logged-in user's username
+    $viewedUser = $_GET['user'] ?? null; // Get the 'user' parameter from the URL
+
     $output = <<<HTML
     <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
         <a class="navbar-brand" href="#"><strong>SellerScore</strong></a>
@@ -88,20 +91,27 @@ function makeNavBar() {
             <ul class="navbar-nav mr-auto">
 HTML;
 
+    // Home link
     $output .= "\n    <li class='nav-item" . ($currentPage == 'index.php' ? ' active' : '') . "'>
                     <a class='nav-link' href='index.php'><strong>Home</strong></a>
                   </li>\n";
 
+    // Links for logged-in users
     if (check_login()) {
+        // My Reputation link
         $output .= "\n    <li class='nav-item" . ($currentPage == 'myReputation.php' ? ' active' : '') . "'>
                       <a class='nav-link' href='myReputation.php'><strong>My Reputation</strong></a>
                     </li>\n";
-        $output .= "\n    <li class='nav-item" . ($currentPage == 'profile.php' ? ' active' : '') . "'>
-                      <a class='nav-link' href='profile.php?user=" . urlencode($_SESSION['username']) . "'><strong>My Profile</strong></a>
+
+        // My Profile link (highlight only if viewing own profile)
+        $isMyProfileActive = ($currentPage == 'profile.php' && $viewedUser === $currentUser) ? ' active' : '';
+        $output .= "\n    <li class='nav-item$isMyProfileActive'>
+                      <a class='nav-link' href='profile.php?user=" . urlencode($currentUser) . "'><strong>My Profile</strong></a>
                     </li>\n";
     }
 
-    if ($currentPage == 'index.php' && !check_login()){
+    // Links for non-logged-in users
+    if ($currentPage == 'index.php' && !check_login()) {
         $output .= <<<HTML
                 <li class="nav-item">
                     <a class="nav-link" href="indexSellers.php"><strong>For Sellers!</strong></a>
@@ -115,6 +125,7 @@ HTML;
 HTML;
     }
 
+    // Search bar
     $output .= <<<HTML
             </ul>
             <ul class="navbar-nav ml-auto">
@@ -130,8 +141,9 @@ HTML;
                 </li>
 HTML;
 
+    // Account management links
     if (check_login()) {
-        $output .= "\n    <li class='nav-item" . ($currentPage == 'manage.php' ? ' active' : '') . "'>
+        $output .= "\n    <li class='nav-item" . ($currentPage == 'manageAccount.php' ? ' active' : '') . "'>
                         <a class='nav-link' href='manageAccount.php'><strong>Manage Account</strong></a>
                       </li>\n";
         $output .= "    <li class='nav-item'>

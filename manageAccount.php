@@ -57,50 +57,53 @@ echo "<div class='card-body'>\n";
 echo "<h3 class='card-title text-center mb-3'>Account Information</h3>\n";
 echo "<form action='updateAccount.php' method='post'>\n";
 
+// Check if the logged-in user is userID 17
+$isDisabled = ($_SESSION['userID'] == 17) ? "disabled" : "";
+
 // Username Field
 echo "<div class='mb-3'>\n";
 echo "<label for='Username' class='form-label'>Username:</label>\n";
-echo "<input type='text' class='form-control' id='Username' name='Username' value='" . htmlspecialchars($user['Username']) . "' disabled>\n"; // Disabled field
+echo "<input type='text' class='form-control' id='Username' name='Username' value='" . htmlspecialchars($user['Username']) . "' $isDisabled>\n";
 echo "</div>\n";
 
 // First Name Field
 echo "<div class='mb-3'>\n";
 echo "<label for='FirstName' class='form-label'>First Name:</label>\n";
-echo "<input type='text' class='form-control' id='FirstName' name='FirstName' value='" . htmlspecialchars($user['FirstName']) . "' required>\n";
+echo "<input type='text' class='form-control' id='FirstName' name='FirstName' value='" . htmlspecialchars($user['FirstName']) . "' required $isDisabled>\n";
 echo "</div>\n";
 
 // Last Name Field
 echo "<div class='mb-3'>\n";
 echo "<label for='LastName' class='form-label'>Last Name:</label>\n";
-echo "<input type='text' class='form-control' id='LastName' name='LastName' value='" . htmlspecialchars($user['Surname']) . "' required>\n";
+echo "<input type='text' class='form-control' id='LastName' name='LastName' value='" . htmlspecialchars($user['Surname']) . "' required $isDisabled>\n";
 echo "</div>\n";
 
 // Email Field
 echo "<div class='mb-3'>\n";
 echo "<label for='Email' class='form-label'>Email:</label>\n";
-echo "<input type='email' class='form-control' id='Email' name='Email' value='" . htmlspecialchars($user['Email']) . "' required>\n";
+echo "<input type='email' class='form-control' id='Email' name='Email' value='" . htmlspecialchars($user['Email']) . "' required $isDisabled>\n";
 echo "</div>\n";
 
 // Date of Birth Field
 echo "<div class='mb-3'>\n";
 echo "<label for='DateOfBirth' class='form-label'>Date of Birth:</label>\n";
-echo "<input type='date' class='form-control' id='DateOfBirth' name='DateOfBirth' value='" . htmlspecialchars($user['DateOfBirth']) . "'>\n";
+echo "<input type='date' class='form-control' id='DateOfBirth' name='DateOfBirth' value='" . htmlspecialchars($user['DateOfBirth']) . "' $isDisabled>\n";
 echo "</div>\n";
 
 // New Password Field
 echo "<div class='mb-3'>\n";
 echo "<label for='NewPassword' class='form-label'>New Password:</label>\n";
-echo "<input type='password' class='form-control' id='NewPassword' name='NewPassword' disabled>\n"; // Disabled field
+echo "<input type='password' class='form-control' id='NewPassword' name='NewPassword' $isDisabled>\n";
 echo "</div>\n";
 
 // Confirm Current Password Field
 echo "<div class='mb-3'>\n";
 echo "<label for='CurrentPassword' class='form-label'>Confirm Current Password:</label>\n";
-echo "<input type='password' class='form-control' id='CurrentPassword' name='CurrentPassword' required>\n";
+echo "<input type='password' class='form-control' id='CurrentPassword' name='CurrentPassword' required $isDisabled>\n";
 echo "</div>\n";
 
 // Submit Button
-echo "<button type='submit' class='btn btn-primary w-100'>Update Account</button>\n";
+echo "<button type='submit' class='btn btn-primary w-100' $isDisabled>Update Account</button>\n";
 
 echo "</form>\n";
 echo "</div>\n"; // Close card-body
