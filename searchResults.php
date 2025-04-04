@@ -11,13 +11,15 @@ echo makeNavBar();
 echo "<div class='container'>";
 echo "<h2>Search Results</h2>";
 
+// Check if the 'account' parameter is provided and not empty
 if (isset($_GET['account']) && !empty(trim($_GET['account']))) {
-    $searchTerm = trim($_GET['account']);
+    // Sanitize the search term to prevent SQL injection
+    $searchTerm = htmlspecialchars(trim($_GET['account']), ENT_QUOTES, 'UTF-8');
 
     try {
         $dbConn = getConnection();
 
-        // Fetch search results
+        // Fetch search results with a prepared statement to prevent SQL injection
         $SQL = "SELECT u.userID, u.username, ur.totalReviews, ur.averageRating, um.marketplaceUsername, m.marketplaceName
                 FROM Users u
                 LEFT JOIN userReputation ur ON u.userID = ur.userID
@@ -34,21 +36,22 @@ if (isset($_GET['account']) && !empty(trim($_GET['account']))) {
                 $userID = $user['userID'];
                 if (!isset($users[$userID])) {
                     $users[$userID] = [
-                        'username' => $user['username'],
-                        'totalReviews' => $user['totalReviews'] ?? 0,
-                        'averageRating' => $user['averageRating'] ?? "N/A",
+                        'username' => htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'),
+                        'totalReviews' => htmlspecialchars($user['totalReviews'] ?? 0, ENT_QUOTES, 'UTF-8'),
+                        'averageRating' => htmlspecialchars($user['averageRating'] ?? "N/A", ENT_QUOTES, 'UTF-8'),
                         'marketplaces' => []
                     ];
                 }
                 if ($user['marketplaceUsername'] && $user['marketplaceName'] && stripos($user['marketplaceUsername'], $searchTerm) !== false) {
                     $users[$userID]['marketplaces'][] = [
-                        'marketplaceUsername' => $user['marketplaceUsername'],
-                        'marketplaceName' => $user['marketplaceName']
+                        'marketplaceUsername' => htmlspecialchars($user['marketplaceUsername'], ENT_QUOTES, 'UTF-8'),
+                        'marketplaceName' => htmlspecialchars($user['marketplaceName'], ENT_QUOTES, 'UTF-8')
                     ];
                 }
             }
 
-            echo "<p>Search results for <strong>$searchTerm</strong></p>";
+            // Display sanitized search results
+            echo "<p>Search results for <strong>" . htmlspecialchars($searchTerm, ENT_QUOTES, 'UTF-8') . "</strong></p>";
             echo "<p>Found <strong>" . count($users) . "</strong> results</p>";
             echo "<p> Please note that if a user has one name on one marketplace, it does not mean they have the same name on another marketplace!</p>";
 
@@ -56,7 +59,7 @@ if (isset($_GET['account']) && !empty(trim($_GET['account']))) {
             foreach ($users as $user) {
                 echo "<li class='list-group-item'>
                         <a href='profile.php?user={$user['username']}' class='d-block text-decoration-none'>
-                        <strong class='text-dark'>{$user['username']}</strong>
+                        <strong class='text-dark'>" . $user['username'] . "</strong>
                         <br>
                         <span class='text-dark'>Reviews: {$user['totalReviews']} | Average Rating: {$user['averageRating']}</span>";
 
@@ -72,11 +75,12 @@ if (isset($_GET['account']) && !empty(trim($_GET['account']))) {
             }
             echo "</ul>";
         } else {
-            echo "<p>No results found for <strong>$searchTerm</strong></p>";
+            echo "<p>No results found for <strong>" . htmlspecialchars($searchTerm, ENT_QUOTES, 'UTF-8') . "</strong></p>";
         }
 
     } catch (Exception $e) {
-        echo "<p class='text-danger'>Error fetching search results: " . $e->getMessage() . "</p>";
+        // Sanitize the error message to prevent XSS
+        echo "<p class='text-danger'>Error fetching search results: " . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . "</p>";
     }
 
 } else {

@@ -5,24 +5,31 @@
  */
 
 require_once("functions.php");
+
+// Generate the page start and navigation bar
 echo makePageStart("Profile");
 echo makeNavBar();
 
 $userHasReputation = false;
 
+// Check if a username is provided in the query string
 if (isset($_GET['user']) && !empty(trim($_GET['user']))) {
-    $username = trim($_GET['user']);
+    $username = trim($_GET['user']); // Get the username from the query string
 
     try {
         $dbConn = getConnection();
+
+        // Fetch user details from the database
         $SQL = "SELECT userID, Username, joinDate, verifiedSeller FROM Users WHERE Username = :username";
         $stmt = $dbConn->prepare($SQL);
         $stmt->execute([':username' => $username]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        // Check if the user exists
         if (!$user) {
+            // Display an error message if the user does not exist
             echo "<div class='container text-center mb-5'>";
-            echo "<h2 class='mb-4'>Account: $username does not exist, please try again!</h2>";
+            echo "<h2 class='mb-4'>Account: " . htmlspecialchars($username, ENT_QUOTES, 'UTF-8') . " does not exist, please try again!</h2>";
             echo "</div>";
         } else {
             echo "<div class='container-fluid text-center mb-5'>";
@@ -31,7 +38,7 @@ if (isset($_GET['user']) && !empty(trim($_GET['user']))) {
                 echo "<h2 class='mb-4'>Your Profile</h2>";
                 echo "</div>";
             } else {
-                echo "<h2 class='mb-4'>$username's Reputation</h2>";
+                echo "<h2 class='mb-4'>" . htmlspecialchars($username, ENT_QUOTES, 'UTF-8') . "'s Reputation</h2>";
             }
 
             echo "<div class='row justify-content-center'>";
@@ -40,6 +47,7 @@ if (isset($_GET['user']) && !empty(trim($_GET['user']))) {
 
             $userID = $user['userID'];
 
+            // Fetch reputation data
             $SQL = "SELECT totalReviews, averageRating, updated
                     FROM userReputation
                     WHERE userID = :userID
@@ -62,13 +70,13 @@ if (isset($_GET['user']) && !empty(trim($_GET['user']))) {
                 echo "</div>";
 
                 echo "<div class='col-md-6'>";
-                echo "<p><strong>Average Rating: </strong>" . $latestRep['averageRating'] . "⭐</p>";
+                echo "<p><strong>Average Rating: </strong>" . htmlspecialchars($latestRep['averageRating'], ENT_QUOTES, 'UTF-8') . "⭐</p>";
                 echo "</div>";
                 echo "</div>";
 
                 echo "<div class='row mb-3'>";
                 echo "<div class='col-md-6'>";
-                echo "<p><strong>Total Reviews: </strong>" . $latestRep['totalReviews'] . "</p>";
+                echo "<p><strong>Total Reviews: </strong>" . htmlspecialchars($latestRep['totalReviews'], ENT_QUOTES, 'UTF-8') . "</p>";
                 echo "</div>";
 
                 $verified = $user['verifiedSeller'] ? "Yes" : "No";
@@ -104,7 +112,7 @@ if (isset($_GET['user']) && !empty(trim($_GET['user']))) {
                     echo "<div class='col-12 col-md-6 mb-3'>";
                     echo "<div class='card'>";
                     echo "<div class='card-body'>";
-                    echo "<h5 class='card-title'>Most Recent Reputation</h5>";
+                    echo "<h4 class='card-title'>Most Recent Reputation</h4>";
                     echo "<p><strong>Average Rating: </strong>" . $latestRep['averageRating'] . "⭐</p>";
                     echo "<p><strong>Total Reviews: </strong>" . $latestRep['totalReviews'] . "</p>";
                     echo "<p><small><strong>Updated: </strong>" . date("d F Y", strtotime($latestRep['updated'])) . "</small></p>";
@@ -115,7 +123,7 @@ if (isset($_GET['user']) && !empty(trim($_GET['user']))) {
                     echo "<div class='col-12 col-md-6 mb-3'>";
                     echo "<div class='card'>";
                     echo "<div class='card-body'>";
-                    echo "<h5 class='card-title'>10th Last Reputation</h5>";
+                    echo "<h4 class='card-title'>10th Last Reputation</h4>";
                     echo "<p><strong>Average Rating: </strong>" . $tenthRep['averageRating'] . "⭐</p>";
                     echo "<p><strong>Total Reviews: </strong>" . $tenthRep['totalReviews'] . "</p>";
                     echo "<p><small><strong>Updated: </strong>" . date("d F Y", strtotime($tenthRep['updated'])) . "</small></p>";
@@ -131,6 +139,7 @@ if (isset($_GET['user']) && !empty(trim($_GET['user']))) {
                     echo "<p>Not enough reputation data available for comparison (requires at least 10 entries).</p>";
                 }
 
+                // Display linked marketplace accounts
                 $SQL = "SELECT u.*, m.marketplaceName
                         FROM userMarketplace u
                         LEFT JOIN Marketplace m ON u.marketplaceID = m.marketplaceID
@@ -144,13 +153,13 @@ if (isset($_GET['user']) && !empty(trim($_GET['user']))) {
                     echo "<div class='list-group'>";
                     foreach ($marketplaceLinks as $link) {
                         echo "<div class='list-group-item d-flex justify-content-between align-items-center'>";
-                        echo "<span>{$link['marketplaceName']}: {$link['marketplaceUsername']}</span>";
+                        echo "<span>" . htmlspecialchars($link['marketplaceName'], ENT_QUOTES, 'UTF-8') . ": " . htmlspecialchars($link['marketplaceUsername'], ENT_QUOTES, 'UTF-8') . "</span>";
                         echo "<span class='badge bg-success'>Active</span>";
                         echo "</div>";
                     }
                     echo "</div>";
                 } else {
-                    echo "<p>No marketplace links available for $username</p>";
+                    echo "<p>No marketplace links available for " . htmlspecialchars($username, ENT_QUOTES, 'UTF-8') . "</p>";
                 }
                 echo "</div>";
 
@@ -174,9 +183,8 @@ if (isset($_GET['user']) && !empty(trim($_GET['user']))) {
                 echo "<option value='etsy'>Etsy</option>";
                 echo "</select>";
 
-                echo "<button type='submit' class='btn btn-primary mb-3'>Apply Filters</button>";
-                echo "</form>";
-
+                echo "<button type='submit' class='btn btn-accessible mb-3'>Apply Filters</button>";
+                
                 echo "<div id='reviewsContainer' class='overflow-auto' style='max-height: 400px; padding-right: 10px; margin-bottom:50px'>";
                 // Reviews will be loaded here dynamically
                 echo "</div>";
@@ -259,7 +267,7 @@ if (isset($_GET['user']) && !empty(trim($_GET['user']))) {
                         }
                         </script>";
             } else {
-                echo "<p>No reputation data available for $username</p>";
+                echo "<p>No reputation data available for " . htmlspecialchars($username, ENT_QUOTES, 'UTF-8') . "</p>";
             }
             echo "</div>"; // Close col-md-5
             echo "</div>"; // Close row justify-content-center
@@ -267,7 +275,7 @@ if (isset($_GET['user']) && !empty(trim($_GET['user']))) {
         }
     } catch (Exception $e) {
         echo "<div class='container text-center mb-5'>";
-        echo "<p class='text-danger'>Error fetching user reputation: " . $e->getMessage() . "</p>";
+        echo "<p class='text-danger'>Error fetching user reputation: " . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . "</p>";
         echo "</div>";
     }
 } else {

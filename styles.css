@@ -68,6 +68,22 @@ html, body {
   padding: 0 15px;
   flex-grow: 1;
 }
+.btn-accessible {
+  background-color: #0056b3;
+  color: #ffffff;
+  border-color: #004494;
+}
+
+.btn-accessible:hover {
+  color: #ffffff;
+  background-color: #004494;
+  border-color: #003366;
+}
+
+.btn-accessible:focus {
+  outline: 3px solid #ffcc00;
+  outline-offset: 2px;
+}
 
 
 

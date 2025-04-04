@@ -60,7 +60,7 @@ echo "<form action='updateAccount.php' method='post'>\n";
 // Username Field
 echo "<div class='mb-3'>\n";
 echo "<label for='Username' class='form-label'>Username:</label>\n";
-echo "<input type='text' class='form-control' id='Username' name='Username' value='" . htmlspecialchars($user['Username']) . "' required>\n";
+echo "<input type='text' class='form-control' id='Username' name='Username' value='" . htmlspecialchars($user['Username']) . "' disabled>\n"; // Disabled field
 echo "</div>\n";
 
 // First Name Field
@@ -90,7 +90,7 @@ echo "</div>\n";
 // New Password Field
 echo "<div class='mb-3'>\n";
 echo "<label for='NewPassword' class='form-label'>New Password:</label>\n";
-echo "<input type='password' class='form-control' id='NewPassword' name='NewPassword'>\n";
+echo "<input type='password' class='form-control' id='NewPassword' name='NewPassword' disabled>\n"; // Disabled field
 echo "</div>\n";
 
 // Confirm Current Password Field
@@ -156,12 +156,8 @@ if (!empty($marketplaceLinks)) {
         echo "<td>" . htmlspecialchars($marketplaceName) . "</td>\n";
         echo "<td>" . htmlspecialchars($link['marketplaceUsername']) . "</td>\n";
         echo "<td>\n";
-        echo "<form action='removeMarketplaceAccount.php' method='post' style='display:inline;'>\n";
-        echo "<input type='hidden' name='marketplaceID' value='" . htmlspecialchars($link['marketplaceID']) . "'>\n";
-        echo "<button type='submit' class='btn btn-danger btn-sm'>Unlink</button>\n";
-        echo "</form>\n";
+        echo "<button class='btn btn-danger btn-sm' disabled>Unlink</button>\n"; // Disabled button
         echo "</td>\n";
-        echo "</tr>\n";
     }
 
     echo "</tbody>\n";

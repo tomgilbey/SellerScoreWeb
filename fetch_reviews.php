@@ -48,17 +48,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         foreach ($feedback as $review) {
             echo "<div class='card mb-3 shadow-sm'>\n";
             echo "<div class='card-body'>\n";
-            echo "<h5 class='card-title'>" . str_repeat("⭐", $review['starRating']) . "</h5>\n";
-            echo "<h6 class='card-subtitle mb-2 text-dark'>From {$review['marketplaceName']} on " . date("d M Y", strtotime($review['dateWritten'])) . "</h6>\n";
-            echo "<p class='card-text'>{$review['textFeedback']}</p>\n";
-            echo "<p class='text-dark'><small>By <strong>{$review['writtenBy']}</strong></small></p>\n";
+            echo "<h3 class='card-title'>" . htmlspecialchars(str_repeat("⭐", $review['starRating']), ENT_QUOTES, 'UTF-8') . "</h3>\n";
+            echo "<h4 class='card-subtitle mb-2 text-dark'>From " . htmlspecialchars($review['marketplaceName'], ENT_QUOTES, 'UTF-8') . " on " . date("d M Y", strtotime($review['dateWritten'])) . "</h4>\n";
+            echo "<p class='card-text'>" . htmlspecialchars($review['textFeedback'], ENT_QUOTES, 'UTF-8') . "</p>\n";
+            echo "<p class='text-dark'><small>By <strong>" . htmlspecialchars($review['writtenBy'], ENT_QUOTES, 'UTF-8') . "</strong></small></p>\n";
             if (!empty($review['Reply'])) {
-                echo "<p class='card-text'>Reply: {$review['Reply']}</p>\n";
+                echo "<p class='card-text'>Reply: " . htmlspecialchars($review['Reply'], ENT_QUOTES, 'UTF-8') . "</p>\n";
             }
 
             // Allow the user to reply to reviews
             if (isset($_SESSION['userID']) && $_SESSION['userID'] == $userID && empty($review['Reply'])) {
-                echo "<button class='btn btn-primary' onclick='showReplyBox({$review['feedbackID']})'>Reply</button>\n";
+                echo "<button class='btn btn-accessible' onclick='event.preventDefault(); showReplyBox({$review['feedbackID']})'>Reply</button>\n";
                 echo "<div id='reply-box-{$review['feedbackID']}' style='display:none; margin-top:10px;'>\n";
                 echo "    <textarea id='reply-text-{$review['feedbackID']}' class='form-control' rows='3' placeholder='Write your reply...'></textarea>\n";
                 echo "    <button class='btn btn-success mt-2' onclick='submitReply({$review['feedbackID']})'>Submit Reply</button>\n";
