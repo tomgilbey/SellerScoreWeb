@@ -19,50 +19,60 @@ if (isset($_GET['account']) && !empty(trim($_GET['account']))) {
     try {
         $dbConn = getConnection();
 
-        // Fetch search results with a prepared statement to prevent SQL injection
-        $SQL = "SELECT u.userID, u.username, ur.totalReviews, ur.averageRating, um.marketplaceUsername, m.marketplaceName
+        // Fetch unique users matching the search term
+        $SQL = "SELECT DISTINCT u.userID, u.username
                 FROM Users u
-                LEFT JOIN userReputation ur ON u.userID = ur.userID
                 LEFT JOIN userMarketplace um ON u.userID = um.userID
-                LEFT JOIN Marketplace m ON um.marketplaceID = m.marketplaceID
                 WHERE u.username LIKE :searchTerm OR um.marketplaceUsername LIKE :searchTerm";
         $stmt = $dbConn->prepare($SQL);
         $stmt->execute([':searchTerm' => "%$searchTerm%"]);
-        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        if ($results) {
-            $users = [];
-            foreach ($results as $user) {
+        if ($users) {
+            $userResults = [];
+            foreach ($users as $user) {
                 $userID = $user['userID'];
 
-                // Initialize the user entry if it doesn't exist
-                if (!isset($users[$userID])) {
-                    $users[$userID] = [
-                        'username' => htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'),
-                        'totalReviews' => htmlspecialchars($user['totalReviews'] ?? 0, ENT_QUOTES, 'UTF-8'),
-                        'averageRating' => htmlspecialchars($user['averageRating'] ?? "N/A", ENT_QUOTES, 'UTF-8'),
-                        'marketplaces' => []
-                    ];
-                }
+                // Fetch totalReviews and averageRating for the user
+                $reputationSQL = "SELECT totalReviews, averageRating
+                                  FROM userReputation
+                                  WHERE userID = :userID
+                                  ORDER BY reputationID DESC
+                                  LIMIT 1";
+                $reputationStmt = $dbConn->prepare($reputationSQL);
+                $reputationStmt->execute([':userID' => $userID]);
+                $reputation = $reputationStmt->fetch(PDO::FETCH_ASSOC);
 
-                // Add marketplace details only if they are not already added
-                $marketplaceEntry = [
-                    'marketplaceUsername' => htmlspecialchars($user['marketplaceUsername'], ENT_QUOTES, 'UTF-8'),
-                    'marketplaceName' => htmlspecialchars($user['marketplaceName'], ENT_QUOTES, 'UTF-8')
+                // Fetch linked marketplace accounts for the user
+                $marketplaceSQL = "SELECT um.marketplaceUsername, m.marketplaceName
+                                   FROM userMarketplace um
+                                   LEFT JOIN Marketplace m ON um.marketplaceID = m.marketplaceID
+                                   WHERE um.userID = :userID";
+                $marketplaceStmt = $dbConn->prepare($marketplaceSQL);
+                $marketplaceStmt->execute([':userID' => $userID]);
+                $marketplaces = $marketplaceStmt->fetchAll(PDO::FETCH_ASSOC);
+
+                // Add user details to the results
+                $userResults[] = [
+                    'username' => htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'),
+                    'totalReviews' => htmlspecialchars($reputation['totalReviews'] ?? 0, ENT_QUOTES, 'UTF-8'),
+                    'averageRating' => htmlspecialchars($reputation['averageRating'] ?? "N/A", ENT_QUOTES, 'UTF-8'),
+                    'marketplaces' => array_map(function ($marketplace) {
+                        return [
+                            'marketplaceUsername' => htmlspecialchars($marketplace['marketplaceUsername'], ENT_QUOTES, 'UTF-8'),
+                            'marketplaceName' => htmlspecialchars($marketplace['marketplaceName'], ENT_QUOTES, 'UTF-8')
+                        ];
+                    }, $marketplaces)
                 ];
-
-                if (!in_array($marketplaceEntry, $users[$userID]['marketplaces'])) {
-                    $users[$userID]['marketplaces'][] = $marketplaceEntry;
-                }
             }
 
             // Display sanitized search results
             echo "<p>Search results for <strong>" . htmlspecialchars($searchTerm, ENT_QUOTES, 'UTF-8') . "</strong></p>";
-            echo "<p>Found <strong>" . count($users) . "</strong> results</p>";
+            echo "<p>Found <strong>" . count($userResults) . "</strong> results</p>";
             echo "<p> Please note that if a user has one name on one marketplace, it does not mean they have the same name on another marketplace!</p>";
 
             echo "<ul class='list-group'>";
-            foreach ($users as $user) {
+            foreach ($userResults as $user) {
                 echo "<li class='list-group-item'>
                         <a href='profile.php?user={$user['username']}' class='d-block text-decoration-none'>
                         <strong class='text-dark'>" . $user['username'] . "</strong>
