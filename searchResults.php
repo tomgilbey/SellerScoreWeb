@@ -34,6 +34,8 @@ if (isset($_GET['account']) && !empty(trim($_GET['account']))) {
             $users = [];
             foreach ($results as $user) {
                 $userID = $user['userID'];
+
+                // Initialize the user entry if it doesn't exist
                 if (!isset($users[$userID])) {
                     $users[$userID] = [
                         'username' => htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'),
@@ -42,11 +44,15 @@ if (isset($_GET['account']) && !empty(trim($_GET['account']))) {
                         'marketplaces' => []
                     ];
                 }
-                if ($user['marketplaceUsername'] && $user['marketplaceName'] && stripos($user['marketplaceUsername'], $searchTerm) !== false) {
-                    $users[$userID]['marketplaces'][] = [
-                        'marketplaceUsername' => htmlspecialchars($user['marketplaceUsername'], ENT_QUOTES, 'UTF-8'),
-                        'marketplaceName' => htmlspecialchars($user['marketplaceName'], ENT_QUOTES, 'UTF-8')
-                    ];
+
+                // Add marketplace details only if they are not already added
+                $marketplaceEntry = [
+                    'marketplaceUsername' => htmlspecialchars($user['marketplaceUsername'], ENT_QUOTES, 'UTF-8'),
+                    'marketplaceName' => htmlspecialchars($user['marketplaceName'], ENT_QUOTES, 'UTF-8')
+                ];
+
+                if (!in_array($marketplaceEntry, $users[$userID]['marketplaces'])) {
+                    $users[$userID]['marketplaces'][] = $marketplaceEntry;
                 }
             }
 
